@@ -9,56 +9,50 @@
     <meta name="author" content="Grupo 3" />
     <title>Login - Gestor de Ventas</title>
     <link href="{{ asset('css/plantilla.css') }}" rel="stylesheet" />
+    <link href="{{ asset('css/login.css') }}" rel="stylesheet">
     <script src="https://use.fontawesome.com/releases/v6.3.0/js/all.js" crossorigin="anonymous"></script>
 </head>
 
-<body class="bg-dark">
-    <div id="layoutAuthentication">
-        <div id="layoutAuthentication_content">
-            <main>
+<body>
+    <div id="layoutAuthentication" class="d-flex align-items-center justify-content-center" style="min-height: 100vh;">
+        <div id="layoutAuthentication_content" class="w-100">
+            <main style="height: 100vh;" class="d-flex align-items-center justify-content-center">
                 <div class="container">
                     <div class="row justify-content-center">
                         <div class="col-lg-5">
-                            <div class="card shadow-lg border-0 rounded-lg mt-5">
-                                <div class="card-header">
-                                    <h3 class="text-center font-weight-light my-4">Inicio de session</h3>
+                            <div class="card text-white">
+                                <div class="card-header text-center">
+                                    <h3 class="my-4">Inicio de sesión</h3>
                                 </div>
                                 <div class="card-body">
                                     @if ($errors->any())
-                                        @foreach ($errors->all() as $item)
-                                            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                                                {{ $item }}
-                                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                                              </div>
-                                        @endforeach
+                                    @foreach ($errors->all() as $item)
+                                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                                        {{ $item }}
+                                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                                    </div>
+                                    @endforeach
                                     @endif
                                     <form action="/login" method="POST">
                                         @csrf
-                                        <div class="form-floating mb-3">
-                                            <input class="form-control" name="email" id="inputEmail" type="email"
-                                                placeholder="nombre@ejemplo.com" value="{{ old('email') }}" />
-                                            <label for="inputEmail">Dirección de correo electrónico</label>
+
+                                        <div class="input-group mb-3">
+                                            <span class="input-group-text bg-white"><i class="fas fa-envelope"></i></span>
+                                            <input type="email" name="email" class="form-control custom-input" placeholder="Correo electrónico" value="{{ old('email') }}">
                                         </div>
-                                        <div class="form-floating mb-3">
-                                            <input class="form-control" name="password" id="inputPassword"
-                                                type="password" placeholder="Contraseña" />
-                                            <label for="inputPassword">Contraseña</label>
+
+                                        <div class="input-group mb-4">
+                                            <span class="input-group-text bg-white"><i class="fas fa-lock"></i></span>
+                                            <input type="password" name="password" class="form-control custom-input" placeholder="Contraseña">
                                         </div>
-                                        <!--
-                                            <div class="form-check mb-3">
-                                                <input class="form-check-input" id="inputRememberPassword" type="checkbox" value="" />
-                                                <label class="form-check-label" for="inputRememberPassword">Remember Password</label>
-                                            </div>
-                                            -->
-                                        <div class="d-flex align-items-center mt-4 mb-0">
-                                            <!--<a class="small" href="password.html">Forgot Password?</a> -->
-                                            <a href="index.html"><button class="btn btn-primary btn-sm"
-                                                    type="submit">Iniciar sesión</button></a>
+
+                                        <div class="d-grid">
+                                            <button type="submit" class="btn btn-login">Iniciar sesión</button>
                                         </div>
                                     </form>
                                 </div>
                                 <div class="card-footer text-center py-3">
-                                    <!-- <div class="small"><a href="register.html">Need an account? Sign up!</a></div> -->
+                                   
                                 </div>
                             </div>
                         </div>
@@ -66,23 +60,9 @@
                 </div>
             </main>
         </div>
-        <div id="layoutAuthentication_footer">
-            <footer class="py-4 bg-light mt-auto">
-                <div class="container-fluid px-4">
-                    <div class="d-flex align-items-center justify-content-between small">
-                        <div class="text-muted">Copyright &copy; Your Website 2023</div>
-                        <div>
-                            <a href="#">Privacy Policy</a>
-                            &middot;
-                            <a href="#">Terms &amp; Conditions</a>
-                        </div>
-                    </div>
-                </div>
-            </footer>
-        </div>
     </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous">
-    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
     <script src="{{ asset('js/scripts.js') }}"></script>
 </body>
 

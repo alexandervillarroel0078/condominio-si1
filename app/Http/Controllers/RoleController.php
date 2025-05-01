@@ -6,9 +6,12 @@ use Illuminate\Http\Request;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
 use Illuminate\Support\Facades\DB;
+use App\Traits\BitacoraTrait;
 
 class RoleController extends Controller
 {
+    use BitacoraTrait;
+
     public function index()
     {
         $roles = Role::all();
@@ -32,12 +35,18 @@ class RoleController extends Controller
         try {
             $role = Role::create(['name' => $request->name, 'guard_name' => 'web']);
             $role->syncPermissions($request->permissions);
+
+            $this->registrarEnBitacora('Rol creado', $role->id); // ← antes del commit
+
+
             DB::commit();
             return redirect()->route('roles.index')->with('success', 'Rol creado correctamente');
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'Error al crear el rol: ' . $e->getMessage());
         }
+
+       
     }
 
     public function edit(Role $role)
@@ -58,17 +67,24 @@ class RoleController extends Controller
         try {
             $role->update(['name' => $request->name]);
             $role->syncPermissions($request->permissions);
+
+            $this->registrarEnBitacora('Rol actualizado', $role->id);
+
             DB::commit();
             return redirect()->route('roles.index')->with('success', 'Rol actualizado correctamente');
         } catch (\Exception $e) {
             DB::rollback();
             return redirect()->back()->with('error', 'Error al actualizar el rol: ' . $e->getMessage());
         }
+
+         
     }
 
     public function destroy(Role $role)
     {
         $role->delete();
+        $this->registrarEnBitacora('Rol eliminado', $role->id);
+
         return redirect()->route('roles.index')->with('success', 'Rol eliminado correctamente');
     }
 
@@ -76,5 +92,4 @@ class RoleController extends Controller
     {
         $this->middleware('auth');
     }
-    
 }

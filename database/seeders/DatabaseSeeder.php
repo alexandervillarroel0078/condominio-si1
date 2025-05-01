@@ -24,7 +24,6 @@ class DatabaseSeeder extends Seeder
             CargoEmpleadosSeeder::class, // ✅ nombre correcto
             EmpleadosSeeder::class,
             ResidentesSeeder::class,
-            
         ]);
     }
 }

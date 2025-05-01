@@ -4,10 +4,12 @@
 <div class="container">
     <h2 class="mb-4">Lista de Residentes</h2>
 
+    @can('crear residentes')
     <a href="{{ route('residentes.create') }}" class="btn btn-primary mb-3">Nuevo Residente</a>
+    @endcan
 
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+    <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
     <form method="GET" action="{{ route('residentes.index') }}" class="mb-3">
@@ -37,12 +39,17 @@
                 <td>{{ $residente->email }}</td>
                 <td>{{ $residente->tipo_residente }}</td>
                 <td>
+                @can('editar residentes')
                     <a href="{{ route('residentes.edit', $residente->id) }}" class="btn btn-sm btn-warning">Editar</a>
+                    @endcan
+
+                    @can('eliminar residentes')
                     <form action="{{ route('residentes.destroy', $residente->id) }}" method="POST" style="display:inline;">
                         @csrf
                         @method('DELETE')
                         <button class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este residente?')">Eliminar</button>
                     </form>
+                    @endcan
                 </td>
             </tr>
             @empty

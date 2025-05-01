@@ -1,5 +1,6 @@
 {{-- resources/views/empleados/edit.blade.php --}}
 @extends('layouts.ap')
+@can('editar empleados')
 @section('content')
 <div class="container">
     <h2>Editar Empleado</h2>
@@ -22,3 +23,4 @@
     </form>
 </div>
 @endsection
+@endcan

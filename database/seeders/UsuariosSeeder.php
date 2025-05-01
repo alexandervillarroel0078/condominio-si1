@@ -5,7 +5,6 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Spatie\Permission\Models\Role;
 
 class UsuariosSeeder extends Seeder
 {
@@ -21,7 +20,7 @@ class UsuariosSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => $password,
         ]);
-        $admin->assignRole('ADMINISTRADOR');
+        $admin->assignRole('Administrador');
 
         // Usuario DIRECTIVA
         $directiva = User::create([
@@ -31,7 +30,7 @@ class UsuariosSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => $password,
         ]);
-        $directiva->assignRole('DIRECTIVA');
+        $directiva->assignRole('Miembro de Directiva');
 
         // Usuario RESIDENTE
         $residente = User::create([
@@ -41,16 +40,16 @@ class UsuariosSeeder extends Seeder
             'email_verified_at' => now(),
             'password' => $password,
         ]);
-        $residente->assignRole('RESIDENTE');
+        $residente->assignRole('Residente');
 
-        // Usuario CONTROL ACCESO
+        // Usuario PORTERO
         $control = User::create([
-            'name' => 'acceso',
-            'email' => 'acceso@gmail.com',
+            'name' => 'portero',
+            'email' => 'portero@gmail.com',
             'activo' => 1,
             'email_verified_at' => now(),
             'password' => $password,
         ]);
-        $control->assignRole('CONTROL ACCESO');
+        $control->assignRole('Portero');
     }
 }

@@ -16,7 +16,8 @@
         <tbody>
             @foreach ($bitacoras as $log)
             <tr>
-                <td>{{ optional($log->user)->name }}</td>
+                <td>{{ $log->usuario ?? 'Invitado' }}</td>
+
                 <td>{{ $log->accion }}</td>
                 <td>{{ $log->fecha_hora }}</td>
                 <td>{{ $log->descripcion ?? '-' }}</td>

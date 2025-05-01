@@ -4,10 +4,12 @@
 <div class="container">
     <h2 class="mb-4">Lista de Empleados</h2>
 
+    @can('crear empleados')
     <a href="{{ route('empleados.create') }}" class="btn btn-primary mb-3">Nuevo Empleado</a>
+    @endcan
 
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+    <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
     <form method="GET" action="{{ route('empleados.index') }}" class="mb-3">
@@ -39,18 +41,22 @@
                 <td>{{ $empleado->fecha_ingreso }}</td>
                 <td>
                     @if($empleado->estado)
-                        <span class="badge bg-success">Activo</span>
+                    <span class="badge bg-success">Activo</span>
                     @else
-                        <span class="badge bg-danger">Inactivo</span>
+                    <span class="badge bg-danger">Inactivo</span>
                     @endif
                 </td>
-                <td>
+                <td>@can('editar empleados')
                     <a href="{{ route('empleados.edit', $empleado->id) }}" class="btn btn-sm btn-warning">Editar</a>
-                    <form action="{{ route('empleados.destroy', $empleado->id) }}" method="POST" style="display:inline;">
+                    @endcan
+
+                    @can('eliminar empleados')
+                     <form action="{{ route('empleados.destroy', $empleado->id) }}" method="POST" style="display:inline;">
                         @csrf
                         @method('DELETE')
                         <button class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar este empleado?')">Eliminar</button>
                     </form>
+                    @endcan
                 </td>
             </tr>
             @empty

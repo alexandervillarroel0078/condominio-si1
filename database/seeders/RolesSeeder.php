@@ -1,7 +1,6 @@
 <?php
 
 namespace Database\Seeders;
-
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
@@ -10,41 +9,27 @@ class RolesSeeder extends Seeder
 {
     public function run(): void
     {
-        
-        $roles = [
-            'ADMINISTRADOR',
-            'DIRECTIVA',
-            'RESIDENTE',
-            'CONTROL ACCESO', // Para entrada y salida
-        ];
+        $admin = Role::create(['name' => 'Administrador']);
+        $admin->givePermissionTo(Permission::all());
 
-        foreach ($roles as $roleName) {
-            Role::firstOrCreate(['name' => $roleName, 'guard_name' => 'web']);
-        }
-
-        $admin     = Role::where('name', 'ADMINISTRADOR')->first();
-        $directiva = Role::where('name', 'DIRECTIVA')->first();
-        $residente = Role::where('name', 'RESIDENTE')->first();
-        $control   = Role::where('name', 'CONTROL ACCESO')->first();
-
-     
-         $permisos = Permission::pluck('name')->toArray();
-         $admin->syncPermissions($permisos);
-         
-
-         // Directiva con permisos limitados
-        $directiva->syncPermissions([
-            'ver-user', 'ver-residente', 'ver-bitacora', 'ver-perfil'
+       $residente = Role::create(['name' => 'Residente']);
+        $residente->givePermissionTo([
+             
         ]);
 
-        // Residente solo puede ver y editar su perfil
-        $residente->syncPermissions([
-            'ver-perfil', 'editar-perfil'
+        $portero = Role::create(['name' => 'Portero']);
+        $portero->givePermissionTo([
+             
         ]);
 
-        // Control de acceso solo puede ver residentes y bitácora
-        $control->syncPermissions([
-            'ver-residente', 'ver-bitacora'
+        $directiva = Role::create(['name' => 'Miembro de Directiva']);
+        $directiva->givePermissionTo([
+            'ver usuarios',
+            'ver roles',
+            'ver empleados',
+            'ver residentes',
+            'ver bitácora',
+            
         ]);
     }
 }

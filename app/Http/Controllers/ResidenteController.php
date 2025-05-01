@@ -4,18 +4,21 @@ namespace App\Http\Controllers;
 
 use App\Models\Residente;
 use Illuminate\Http\Request;
+use App\Traits\BitacoraTrait;
 
 class ResidenteController extends Controller
 {
+    use BitacoraTrait;
+
     public function index(Request $request)
     {
         $search = $request->input('search');
 
         $residentes = Residente::when($search, function ($query, $search) {
-                $query->where('nombre', 'like', "%$search%")
-                      ->orWhere('apellido', 'like', "%$search%")
-                      ->orWhere('ci', 'like', "%$search%");
-            })
+            $query->where('nombre', 'like', "%$search%")
+                ->orWhere('apellido', 'like', "%$search%")
+                ->orWhere('ci', 'like', "%$search%");
+        })
             ->orderBy('id', 'asc')
             ->paginate(10);
 
@@ -37,7 +40,8 @@ class ResidenteController extends Controller
             'tipo_residente' => 'required|string|max:100',
         ]);
 
-        Residente::create($validated);
+        $residente = Residente::create($validated);
+        $this->registrarEnBitacora('Residente creado', $residente->id);
 
         return redirect()->route('residentes.index')->with('success', 'Residente registrado correctamente.');
     }
@@ -63,6 +67,7 @@ class ResidenteController extends Controller
         ]);
 
         $residente->update($validated);
+        $this->registrarEnBitacora('Residente actualizado', $residente->id);
 
         return redirect()->route('residentes.index')->with('success', 'Residente actualizado correctamente.');
     }
@@ -70,6 +75,8 @@ class ResidenteController extends Controller
     public function destroy(Residente $residente)
     {
         $residente->delete();
+        $this->registrarEnBitacora('Residente eliminado', $residente->id);
+
         return redirect()->route('residentes.index')->with('success', 'Residente eliminado correctamente.');
     }
 }

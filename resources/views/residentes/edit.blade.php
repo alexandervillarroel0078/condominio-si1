@@ -1,5 +1,5 @@
 @extends('layouts.ap')
-
+@can('editar residentes')
 @section('content')
 <div class="container">
     <h2 class="mb-4">Editar Residente</h2>
@@ -53,3 +53,4 @@
     </form>
 </div>
 @endsection
+@endcan

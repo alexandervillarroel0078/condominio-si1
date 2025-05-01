@@ -1,5 +1,5 @@
 @extends('layouts.ap')
-
+@can('crear empleados')
 @section('content')
 <div class="container">
     <h2 class="mb-4">Registrar Nuevo Empleado</h2>
@@ -66,3 +66,4 @@
     </form>
 </div>
 @endsection
+@endcan

@@ -5,11 +5,13 @@ namespace App\Http\Controllers;
 use App\Models\Empleado;
 use Illuminate\Http\Request;
 use App\Models\CargoEmpleado;
+use App\Traits\BitacoraTrait;
 
 class EmpleadoController extends Controller
 
 {
-    // Mostrar lista de empleados
+    use BitacoraTrait;
+     
     public function index(Request $request)
     {
         $search = $request->input('search');
@@ -42,7 +44,8 @@ class EmpleadoController extends Controller
             'cargo_empleado_id' => 'required|exists:cargo_empleados,id',
         ]);
 
-        Empleado::create($validated);
+        $empleado = Empleado::create($validated);
+        $this->registrarEnBitacora('Empleado creado', $empleado->id);
 
         return redirect()->route('empleados.index')->with('success', 'Empleado registrado correctamente.');
     }
@@ -71,6 +74,7 @@ class EmpleadoController extends Controller
         ]);
 
         $empleado->update($validated);
+        $this->registrarEnBitacora('Empleado actualizado', $empleado->id);
 
         return redirect()->route('empleados.index')->with('success', 'Empleado actualizado correctamente.');
     }
@@ -80,6 +84,8 @@ class EmpleadoController extends Controller
     public function destroy(Empleado $empleado)
     {
         $empleado->delete();
+        $this->registrarEnBitacora('Empleado eliminado', $empleado->id);
+
         return redirect()->route('empleados.index')->with('success', 'Empleado eliminado correctamente.');
     }
 }

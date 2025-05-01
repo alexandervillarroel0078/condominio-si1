@@ -9,41 +9,31 @@ class PermissionSeeder extends Seeder
 {
     public function run(): void
     {
-        $permisos = [
-            // Usuarios
-            'ver-user',
-            'crear-user',
-            'editar-user',
-            'eliminar-user',
+        // Módulo: Usuarios
+        Permission::create(['name' => 'ver usuarios']);
+        Permission::create(['name' => 'crear usuarios']);
+        Permission::create(['name' => 'editar usuarios']);
+        Permission::create(['name' => 'eliminar usuarios']);
 
-            // Roles
-            'ver-role',
-            'crear-role',
-            'editar-role',
-            'eliminar-role',
+        // Módulo: Roles y permisos
+        Permission::create(['name' => 'ver roles']);
+        Permission::create(['name' => 'crear roles']);
+        Permission::create(['name' => 'editar roles']);
+        Permission::create(['name' => 'eliminar roles']);
 
-            // Empleados
-            'ver-empleado',
-            'crear-empleado',
-            'editar-empleado',
-            'eliminar-empleado',
+        // Módulo: Empleados
+        Permission::create(['name' => 'ver empleados']);
+        Permission::create(['name' => 'crear empleados']);
+        Permission::create(['name' => 'editar empleados']);
+        Permission::create(['name' => 'eliminar empleados']);
 
-            // Residentes
-            'ver-residente',
-            'crear-residente',
-            'editar-residente',
-            'eliminar-residente',
+        // Módulo: Residentes
+        Permission::create(['name' => 'ver residentes']);
+        Permission::create(['name' => 'crear residentes']);
+        Permission::create(['name' => 'editar residentes']);
+        Permission::create(['name' => 'eliminar residentes']);
 
-            // Bitácora
-            'ver-bitacora',
-
-            // Perfil
-            'ver-perfil',
-            'editar-perfil',
-        ];
-
-        foreach ($permisos as $permiso) {
-            Permission::firstOrCreate(['name' => $permiso]);
-        }
+        // Módulo: Bitácora
+        Permission::create(['name' => 'ver bitácora']);
     }
 }

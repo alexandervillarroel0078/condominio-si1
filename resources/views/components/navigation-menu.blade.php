@@ -7,7 +7,7 @@
                     <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                     Inicio
                 </a>
-<!--
+                <!--
                 <div class="sb-sidenav-menu-heading">Módulos</div>
 
                 <a class="nav-link" href="{{ route('users.index') }}">
@@ -86,25 +86,49 @@
                         {{-- Otras secciones --}}
                         <a class="nav-link" href="{{ route('residentes.index') }}">Residentes</a>
                         <a class="nav-link" href="#">Unidades</a>
-                        <a class="nav-link" href="#">Empresas Externas</a>
-                        <a class="nav-link" href="#">Mantenimiento</a>
+                  <a class="nav-link" href="{{ route('empresas.index') }}">Empresas Externas</a>
+      <a class="nav-link" href="#">Mantenimiento</a>
                     </nav>
                 </div>
 
+                {{-- Finanzas y Áreas Comunes --}}
 
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseFinanzas" aria-expanded="false" aria-controls="collapseFinanzas">
+                <a class="nav-link {{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') ? '' : 'collapsed' }}"
+                    href="#" data-bs-toggle="collapse" data-bs-target="#collapseFinanzas"
+                    aria-expanded="{{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') ? 'true' : 'false' }}"
+                    aria-controls="collapseFinanzas">
                     <div class="sb-nav-link-icon"><i class="fas fa-hand-holding-usd"></i></div>
                     Finanzas y Áreas Comunes
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse" id="collapseFinanzas" data-bs-parent="#sidenavAccordion">
+                <div class="collapse {{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') ? 'show' : '' }}" id="collapseFinanzas" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="#">Cuotas y Pagos</a>
+                        <a class="nav-link {{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') ? '' : 'collapsed' }}"
+                            href="#" data-bs-toggle="collapse" data-bs-target="#collapseCuotas"
+                            aria-expanded="{{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') ? 'true' : 'false' }}"
+                            aria-controls="collapseCuotas">
+                            <div class="sb-nav-link-icon"><i class="fas fa-receipt"></i></div>
+                            Cuotas y Pagos
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse {{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') || request()->routeIs('pagos.*') ? 'show' : '' }}" id="collapseCuotas" data-bs-parent="#collapseFinanzas">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link {{ request()->routeIs('cuotas.index') ? 'active' : '' }}" href="{{ route('cuotas.index') }}">Lista de Cuotas</a>
+                                <a class="nav-link {{ request()->routeIs('tipos-cuotas.index') ? 'active' : '' }}" href="{{ route('tipos-cuotas.index') }}">Tipos de Cuotas</a>
+                                <a class="nav-link {{ request()->routeIs('pagos.index') ? 'active' : '' }}" href="{{ route('pagos.index') }}">Pagos Realizados</a>
+                            </nav>
+                        </div>
+
+
                         <a class="nav-link" href="#">Gastos del Condominio</a>
                         <a class="nav-link" href="#">Reservas de Áreas Comunes</a>
                         <a class="nav-link" href="#">Multas y Sanciones</a>
                     </nav>
                 </div>
+
+
+
+
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseComunicacion" aria-expanded="false" aria-controls="collapseComunicacion">
                     <div class="sb-nav-link-icon"><i class="fas fa-comments"></i></div>
                     Comunicación y Atención al Residente
@@ -145,7 +169,7 @@
                         <a class="nav-link" href="#">Foro Vecinal</a>
                     </nav>
                 </div>
-<a class="nav-link" href="{{ route('bitacora.index') }}">
+                <a class="nav-link" href="{{ route('bitacora.index') }}">
                     <div class="sb-nav-link-icon"><i class="fas fa-book"></i></div>
                     Bitácora
                 </a>

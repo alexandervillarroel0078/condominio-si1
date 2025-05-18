@@ -76,106 +76,106 @@
 
         <div class="row">
             {{-- Paquete: Usuarios --}}
-<div class="col-xl-4 col-md-6">
-    <div class="card bg-primary text-white mb-4">
-        <div class="card-body text-center">
-            <i class="fas fa-users fa-2x mb-2"></i><br>
-            Usuarios
-        </div>
-        <div class="card-footer d-flex align-items-center justify-content-between">
-            <a class="small text-white stretched-link" href="#" data-bs-toggle="modal" data-bs-target="#usuariosModal">Ver detalles</a>
-            <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-        </div>
-    </div>
-</div>
+            <div class="col-xl-4 col-md-6">
+                <div class="card bg-primary text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users fa-2x mb-2"></i><br>
+                        Usuarios
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <a class="small text-white stretched-link" href="#" data-bs-toggle="modal" data-bs-target="#usuariosModal">Ver detalles</a>
+                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
 
-{{-- Paquete: Administración Interna --}}
-<div class="col-xl-4 col-md-6">
-    <div class="card bg-secondary text-white mb-4">
-        <div class="card-body text-center">
-            <i class="fas fa-cogs fa-2x mb-2"></i><br>
-            <strong>Administración Interna</strong>
-        </div>
-        <div class="card-footer d-flex align-items-center justify-content-between">
-            <a class="small text-white stretched-link" href="#" data-bs-toggle="modal" data-bs-target="#adminInternaModal">Ver detalles</a>
-            <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-        </div>
-    </div>
-</div>
-
-
-         {{-- Paquete: Finanzas y Áreas Comunes --}}
-<div class="col-xl-4 col-md-6">
-    <div class="card bg-success text-white mb-4">
-        <div class="card-body text-center">
-            <i class="fas fa-hand-holding-usd fa-2x mb-2"></i><br>
-            Finanzas y Áreas Comunes
-        </div>
-        <div class="card-footer d-flex align-items-center justify-content-between">
-            <a class="small text-white stretched-link" href="#" data-bs-toggle="modal" data-bs-target="#finanzasModal">Ver detalles</a>
-            <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-        </div>
-    </div>
-</div>
+            {{-- Paquete: Administración Interna --}}
+            <div class="col-xl-4 col-md-6">
+                <div class="card bg-secondary text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-cogs fa-2x mb-2"></i><br>
+                        <strong>Administración Interna</strong>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <a class="small text-white stretched-link" href="#" data-bs-toggle="modal" data-bs-target="#adminInternaModal">Ver detalles</a>
+                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
 
 
-           {{-- Paquete: Comunicación y Atención al Residente --}}
-<div class="col-xl-4 col-md-6">
-    <div class="card bg-info text-white mb-4">
-        <div class="card-body text-center">
-            <i class="fas fa-comments fa-2x mb-2"></i><br>
-            <strong>Comunicación y Atención al Residente</strong>
-        </div>
-        <div class="card-footer d-flex align-items-center justify-content-between">
-            <a class="small text-white stretched-link" href="#" data-bs-toggle="modal" data-bs-target="#comunicacionModal">Ver detalles</a>
-            <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-        </div>
-    </div>
-</div>
+            {{-- Paquete: Finanzas y Áreas Comunes --}}
+            <div class="col-xl-4 col-md-6">
+                <div class="card bg-success text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-hand-holding-usd fa-2x mb-2"></i><br>
+                        Finanzas y Áreas Comunes
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <a class="small text-white stretched-link" href="#" data-bs-toggle="modal" data-bs-target="#finanzasModal">Ver detalles</a>
+                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
+
+
+            {{-- Paquete: Comunicación y Atención al Residente --}}
+            <div class="col-xl-4 col-md-6">
+                <div class="card bg-info text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-comments fa-2x mb-2"></i><br>
+                        <strong>Comunicación y Atención al Residente</strong>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <a class="small text-white stretched-link" href="#" data-bs-toggle="modal" data-bs-target="#comunicacionModal">Ver detalles</a>
+                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
 
 
             {{-- Paquete: Seguridad y Accesos --}}
-<div class="col-xl-4 col-md-6">
-    <div class="card bg-warning text-dark mb-4">
-        <div class="card-body text-center">
-            <i class="fas fa-shield-alt fa-2x mb-2"></i><br>
-            <strong>Seguridad y Accesos</strong>
-        </div>
-        <div class="card-footer d-flex align-items-center justify-content-between">
-            <a class="small text-dark stretched-link" href="#" data-bs-toggle="modal" data-bs-target="#seguridadModal">Ver detalles</a>
-            <div class="small text-dark"><i class="fas fa-angle-right"></i></div>
-        </div>
-    </div>
-</div>
+            <div class="col-xl-4 col-md-6">
+                <div class="card bg-warning text-dark mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-shield-alt fa-2x mb-2"></i><br>
+                        <strong>Seguridad y Accesos</strong>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <a class="small text-dark stretched-link" href="#" data-bs-toggle="modal" data-bs-target="#seguridadModal">Ver detalles</a>
+                        <div class="small text-dark"><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
 
 
             {{-- Paquete: Comunidad y Reportes --}}
-<div class="col-xl-4 col-md-6">
-    <div class="card bg-dark text-white mb-4">
-        <div class="card-body text-center">
-            <i class="fas fa-users-cog fa-2x mb-2"></i><br>
-            <strong>Comunidad y Reportes</strong>
-        </div>
-        <div class="card-footer d-flex align-items-center justify-content-between">
-            <a class="small text-white stretched-link" href="#" data-bs-toggle="modal" data-bs-target="#comunidadModal">Ver detalles</a>
-            <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-        </div>
-    </div>
-</div>
+            <div class="col-xl-4 col-md-6">
+                <div class="card bg-dark text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-users-cog fa-2x mb-2"></i><br>
+                        <strong>Comunidad y Reportes</strong>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <a class="small text-white stretched-link" href="#" data-bs-toggle="modal" data-bs-target="#comunidadModal">Ver detalles</a>
+                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
 
-           {{-- Paquete: Bitácora --}}
-<div class="col-xl-4 col-md-6">
-    <div class="card bg-danger text-white mb-4">
-        <div class="card-body text-center">
-            <i class="fas fa-book fa-2x mb-2"></i><br>
-            <strong>Bitácora</strong>
-        </div>
-        <div class="card-footer d-flex align-items-center justify-content-between">
-            <a class="small text-white stretched-link" href="#" data-bs-toggle="modal" data-bs-target="#bitacoraModal">Ver detalles</a>
-            <div class="small text-white"><i class="fas fa-angle-right"></i></div>
-        </div>
-    </div>
-</div>
+            {{-- Paquete: Bitácora --}}
+            <div class="col-xl-4 col-md-6">
+                <div class="card bg-danger text-white mb-4">
+                    <div class="card-body text-center">
+                        <i class="fas fa-book fa-2x mb-2"></i><br>
+                        <strong>Bitácora</strong>
+                    </div>
+                    <div class="card-footer d-flex align-items-center justify-content-between">
+                        <a class="small text-white stretched-link" href="#" data-bs-toggle="modal" data-bs-target="#bitacoraModal">Ver detalles</a>
+                        <div class="small text-white"><i class="fas fa-angle-right"></i></div>
+                    </div>
+                </div>
+            </div>
 
         </div>
 

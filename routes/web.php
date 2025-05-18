@@ -14,6 +14,23 @@ use App\Http\Controllers\residenteController;
 use App\Http\Controllers\bitacoraController;
 use App\Http\Controllers\empleadoController;
 use App\Http\Controllers\CargoEmpleadoController;
+ 
+use App\Http\Controllers\CuotaController;
+use App\Http\Controllers\TipoCuotaController;
+use App\Http\Controllers\PagoController;
+use App\Http\Controllers\EmpresaController;
+
+ 
+Route::middleware(['auth'])->group(function () {
+    Route::resource('pagos', PagoController::class)->only(['index', 'create', 'store']);
+});
+Route::resource('empresas', \App\Http\Controllers\EmpresaExternaController::class);
+
+Route::resource('tipos-cuotas', TipoCuotaController::class);
+ 
+Route::resource('cuotas', CuotaController::class);
+
+Route::get('/cuotasypagos', [CuotaController::class, 'index'])->name('cuotas.index');
 
 Route::prefix('empleados/cargo')->group(function () {
     Route::get('/', [CargoEmpleadoController::class, 'index'])->name('cargos.index');

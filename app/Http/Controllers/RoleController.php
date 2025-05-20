@@ -14,27 +14,31 @@ class RoleController extends Controller
 
     public function index()
     {
-        $roles = Role::all();
+        $roles = Role::with('permissions')->get(); // ← importante
         return view('roles.index', compact('roles'));
     }
+
 
     public function create()
     {
         $permisos = Permission::all();
         return view('roles.create', compact('permisos'));
     }
-
+    /*
     public function store(Request $request)
     {
         $request->validate([
             'name' => 'required|unique:roles,name',
-            'permissions' => 'required|array|min:1'
+            //'permissions' => 'required|array|min:1'
+            'permission' => 'required|array|min:1'
+
         ]);
 
         DB::beginTransaction();
         try {
             $role = Role::create(['name' => $request->name, 'guard_name' => 'web']);
-            $role->syncPermissions($request->permissions);
+            //   $role->syncPermissions($request->permissions);
+            $role->syncPermissions($request->permission);
 
             $this->registrarEnBitacora('Rol creado', $role->id); // ← antes del commit
 
@@ -45,8 +49,25 @@ class RoleController extends Controller
             DB::rollback();
             return redirect()->back()->with('error', 'Error al crear el rol: ' . $e->getMessage());
         }
+    } */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|unique:roles,name',
+            'permission' => 'required|array|min:1',
+            'permission.*' => 'exists:permissions,id'
+        ]);
 
-       
+        $role = Role::create([
+            'name' => $request->name,
+            'guard_name' => 'web'
+        ]);
+
+
+        $permissions = Permission::whereIn('id', $request->permission)->pluck('name');
+        $role->syncPermissions($permissions);
+
+        return redirect()->route('roles.index')->with('success', 'Rol creado correctamente');
     }
 
     public function edit(Role $role)
@@ -56,17 +77,22 @@ class RoleController extends Controller
         return view('roles.edit', compact('role', 'permisos', 'permisosRol'));
     }
 
+
     public function update(Request $request, Role $role)
     {
         $request->validate([
-            'name' => 'required|unique:roles,name,' . $role->id,
-            'permissions' => 'required|array|min:1'
+            'name' => 'required|string|unique:roles,name,' . $role->id,
+            'permission' => 'required|array|min:1',
+            'permission.*' => 'exists:permissions,id'
         ]);
 
         DB::beginTransaction();
         try {
             $role->update(['name' => $request->name]);
-            $role->syncPermissions($request->permissions);
+
+            // Convertimos los IDs a nombres como hicimos en store()
+            $permissions = Permission::whereIn('id', $request->permission)->pluck('name');
+            $role->syncPermissions($permissions);
 
             $this->registrarEnBitacora('Rol actualizado', $role->id);
 
@@ -76,10 +102,9 @@ class RoleController extends Controller
             DB::rollback();
             return redirect()->back()->with('error', 'Error al actualizar el rol: ' . $e->getMessage());
         }
-
-         
     }
 
+    
     public function destroy(Role $role)
     {
         $role->delete();

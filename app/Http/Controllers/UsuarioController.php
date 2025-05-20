@@ -7,6 +7,7 @@ use App\Http\Requests\StoreUsuarioRequest;
 use App\Http\Requests\updateUsuarioRequest;
 use App\Models\Empleado;
 use App\Models\User;
+use App\Models\Cliente;
 use Exception;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -27,14 +28,15 @@ class UsuarioController extends Controller
     }
 
 
-    public function create()
-    {
-        $roles = Role::all();
-        $empleados = Empleado::all();
-        $residentes = \App\Models\Residente::all();
+ public function create()
+{
+    $roles = Role::all();
+    $empleados = Empleado::all();
+    $residentes = \App\Models\Residente::all();
 
-        return view('users.create', compact('roles', 'empleados', 'residentes'));
-    }
+    return view('users.create', compact('roles', 'empleados', 'residentes'));
+}
+
 
     public function store(StoreUsuarioRequest $request)
     {
@@ -79,14 +81,13 @@ class UsuarioController extends Controller
     }
 
 
-    public function edit(User $user)
+ public function edit(User $user)
 {
-    $empleados = Empleado::all();
-    $residentes = \App\Models\Residente::all();
+    $empleados = \App\Models\Empleado::all();
     $roles = Role::all();
-
-    return view('users.edit', compact('user', 'empleados', 'residentes', 'roles'));
+    return view('users.edit', compact('user', 'roles', 'empleados'));
 }
+
 
 
 public function update(updateUsuarioRequest $request, User $user)
@@ -105,16 +106,23 @@ public function update(updateUsuarioRequest $request, User $user)
             'residente_id' => $request->residente_id,
         ]);
 
+        if ($request->filled('password')) {
+            $user->password = Hash::make($request->password);
+            $user->save(); // necesario si editamos password luego del update()
+        }
+
         $user->syncRoles([$request->role]);
         $this->registrarEnBitacora('Usuario actualizado', $user->id);
         DB::commit();
+
+        return redirect()->route('users.index')->with('success', 'El usuario se ha actualizado');
     } catch (Exception $e) {
         DB::rollBack();
         $this->registrarEnBitacora('Error al actualizar usuario: ' . $e->getMessage());
+        return back()->withErrors(['error' => 'Ocurrió un error al actualizar el usuario.'])->withInput();
     }
-
-    return redirect()->route('users.index')->with('success', 'El usuario se ha actualizado');
 }
+
 
 
     public function destroy(string $id)

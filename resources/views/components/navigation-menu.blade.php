@@ -51,7 +51,8 @@
                 <div class="sb-sidenav-menu-heading">Módulos2</div>
 
 
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseUsuarios" aria-expanded="false" aria-controls="collapseUsuarios">
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                    data-bs-target="#collapseUsuarios" aria-expanded="false" aria-controls="collapseUsuarios">
                     <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
                     Usuarios
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
@@ -63,7 +64,9 @@
                     </nav>
                 </div>
 
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseAdministracion" aria-expanded="false" aria-controls="collapseAdministracion">
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                    data-bs-target="#collapseAdministracion" aria-expanded="false"
+                    aria-controls="collapseAdministracion">
                     <div class="sb-nav-link-icon"><i class="fas fa-cogs"></i></div>
                     Administración Interna
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
@@ -72,7 +75,8 @@
                     <nav class="sb-sidenav-menu-nested nav">
 
                         {{-- Empleados con submenú --}}
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseEmpleados" aria-expanded="false" aria-controls="collapseEmpleados">
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                            data-bs-target="#collapseEmpleados" aria-expanded="false" aria-controls="collapseEmpleados">
                             Empleados
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
@@ -86,8 +90,8 @@
                         {{-- Otras secciones --}}
                         <a class="nav-link" href="{{ route('residentes.index') }}">Residentes</a>
                         <a class="nav-link" href="#">Unidades</a>
-                  <a class="nav-link" href="{{ route('empresas.index') }}">Empresas Externas</a>
-      <a class="nav-link" href="#">Mantenimiento</a>
+                        <a class="nav-link" href="{{ route('empresas.index') }}">Empresas Externas</a>
+                        <a class="nav-link" href="#">Mantenimiento</a>
                     </nav>
                 </div>
 
@@ -101,7 +105,8 @@
                     Finanzas y Áreas Comunes
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse {{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') ? 'show' : '' }}" id="collapseFinanzas" data-bs-parent="#sidenavAccordion">
+                <div class="collapse {{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') ? 'show' : '' }}"
+                    id="collapseFinanzas" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link {{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') ? '' : 'collapsed' }}"
                             href="#" data-bs-toggle="collapse" data-bs-target="#collapseCuotas"
@@ -111,25 +116,46 @@
                             Cuotas y Pagos
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
-                        <div class="collapse {{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') || request()->routeIs('pagos.*') ? 'show' : '' }}" id="collapseCuotas" data-bs-parent="#collapseFinanzas">
+                        <div class="collapse {{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') || request()->routeIs('pagos.*') ? 'show' : '' }}"
+                            id="collapseCuotas" data-bs-parent="#collapseFinanzas">
                             <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link {{ request()->routeIs('cuotas.index') ? 'active' : '' }}" href="{{ route('cuotas.index') }}">Lista de Cuotas</a>
-                                <a class="nav-link {{ request()->routeIs('tipos-cuotas.index') ? 'active' : '' }}" href="{{ route('tipos-cuotas.index') }}">Tipos de Cuotas</a>
-                                <a class="nav-link {{ request()->routeIs('pagos.index') ? 'active' : '' }}" href="{{ route('pagos.index') }}">Pagos Realizados</a>
+                                <a class="nav-link {{ request()->routeIs('cuotas.index') ? 'active' : '' }}"
+                                    href="{{ route('cuotas.index') }}">Lista de Cuotas</a>
+                                <a class="nav-link {{ request()->routeIs('tipos-cuotas.index') ? 'active' : '' }}"
+                                    href="{{ route('tipos-cuotas.index') }}">Tipos de Cuotas</a>
+                                <a class="nav-link {{ request()->routeIs('pagos.index') ? 'active' : '' }}"
+                                    href="{{ route('pagos.index') }}">Pagos Realizados</a>
                             </nav>
                         </div>
+                        <a class="nav-link {{ request()->routeIs('tipo-gastos.*') || request()->routeIs('gastos.*') ? '' : 'collapsed' }}"
+                            href="#" data-bs-toggle="collapse" data-bs-target="#collapseGastos"
+                            aria-expanded="{{ request()->routeIs('tipo-gastos.*') || request()->routeIs('gastos.*') ? 'true' : 'false' }}"
+                            aria-controls="collapseGastos">
+                            <div class="sb-nav-link-icon"><i class="fas fa-money-bill-wave"></i></div>
+                            Gestión de Gastos
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse {{ request()->routeIs('tipo-gastos.*') || request()->routeIs('gastos.*') ? 'show' : '' }}"
+                            id="collapseGastos" data-bs-parent="#sidenavAccordion">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link {{ request()->routeIs('gastos.index') ? 'active' : '' }}"
+                                    href="{{ route('gastos.index') }}">Lista de Gastos</a>
+                                <a class="nav-link {{ request()->routeIs('tipo-gastos.index') ? 'active' : '' }}"
+                                    href="{{ route('tipo-gastos.index') }}">
+                                    Tipos de Gastos
+                                </a>
 
-
-                        <a class="nav-link" href="#">Gastos del Condominio</a>
-                        <a class="nav-link" href="#">Reservas de Áreas Comunes</a>
-                        <a class="nav-link" href="#">Multas y Sanciones</a>
+                            </nav>
+                        </div>
                     </nav>
                 </div>
 
 
 
 
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseComunicacion" aria-expanded="false" aria-controls="collapseComunicacion">
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                    data-bs-target="#collapseComunicacion" aria-expanded="false"
+                    aria-controls="collapseComunicacion">
                     <div class="sb-nav-link-icon"><i class="fas fa-comments"></i></div>
                     Comunicación y Atención al Residente
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
@@ -142,7 +168,8 @@
                         <a class="nav-link" href="#">Notificaciones</a>
                     </nav>
                 </div>
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseSeguridad" aria-expanded="false" aria-controls="collapseSeguridad">
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                    data-bs-target="#collapseSeguridad" aria-expanded="false" aria-controls="collapseSeguridad">
                     <div class="sb-nav-link-icon"><i class="fas fa-shield-alt"></i></div>
                     Seguridad y Accesos
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
@@ -155,7 +182,8 @@
                         <a class="nav-link" href="#">Seguridad y Vigilancia</a>
                     </nav>
                 </div>
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseComunidad" aria-expanded="false" aria-controls="collapseComunidad">
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                    data-bs-target="#collapseComunidad" aria-expanded="false" aria-controls="collapseComunidad">
                     <div class="sb-nav-link-icon"><i class="fas fa-users-cog"></i></div>
                     Comunidad y Reportes
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>

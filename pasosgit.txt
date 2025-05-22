@@ -1,0 +1,16 @@
+#SOLO PARA ACTUALIZAR EL GIT 
+
+# Abre Git Bash y asegúrate de estar en la ruta del proyecto:
+cd /c/xampp/htdocs/condominio-si1
+
+# Verifica el estado del repositorio:
+git status
+
+# Agrega todos los cambios:
+git add .
+
+# Realiza un commit con un mensaje:
+git commit -m "Actualización de proyecto"
+
+# Envía los cambios al repositorio remoto:
+git push origin main

@@ -10,6 +10,6 @@ class EmpresaExternaSeeder extends Seeder
 {
     public function run(): void
     {
-        EmpresaExterna::factory()->count(10)->create();
+        EmpresaExterna::factory()->count(50)->create();
     }
 }

@@ -8,24 +8,26 @@ use App\Http\Requests\UnidadRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use App\Traits\BitacoraTrait;
 
 class UnidadController extends Controller
 {
-public function index(Request $request): View
-{
-    $search = $request->input('search');
+    use BitacoraTrait;
+    public function index(Request $request): View
+    {
+        $search = $request->input('search');
 
-    $unidades = Unidad::when($search, function($query, $search) {
+        $unidades = Unidad::when($search, function ($query, $search) {
             $query->where('codigo', 'like', "%{$search}%")
-                  ->orWhere('placa',  'like', "%{$search}%")
-                  ->orWhere('marca',  'like', "%{$search}%");
+                ->orWhere('placa',  'like', "%{$search}%")
+                ->orWhere('marca',  'like', "%{$search}%");
         })
-        ->orderBy('id', 'asc')     // ← cambio aquí
-        ->paginate(10)
-        ->appends(['search' => $search]);
+            ->orderBy('id', 'asc')     // ← cambio aquí
+            ->paginate(10)
+            ->appends(['search' => $search]);
 
-    return view('unidades.index', compact('unidades'));
-}
+        return view('unidades.index', compact('unidades'));
+    }
 
     public function create(): View
     {
@@ -34,10 +36,11 @@ public function index(Request $request): View
 
     public function store(UnidadRequest $request): RedirectResponse
     {
-        Unidad::create($request->validated());
+        $unidad = Unidad::create($request->validated());
+        $this->registrarEnBitacora('Unidad creada', $unidad->id);
         return redirect()
-               ->route('unidades.index')
-               ->with('success','Unidad creada correctamente.');
+            ->route('unidades.index')
+            ->with('success', 'Unidad creada correctamente.');
     }
 
     public function edit(Unidad $unidad): View
@@ -48,14 +51,17 @@ public function index(Request $request): View
     public function update(UnidadRequest $request, Unidad $unidad): RedirectResponse
     {
         $unidad->update($request->validated());
+
+        $this->registrarEnBitacora('Unidad actualizada', $unidad->id);
         return redirect()
-               ->route('unidades.index')
-               ->with('success','Unidad actualizada correctamente.');
+            ->route('unidades.index')
+            ->with('success', 'Unidad actualizada correctamente.');
     }
 
     public function destroy(Unidad $unidad): RedirectResponse
     {
         $unidad->delete();
-        return back()->with('success','Unidad eliminada.');
+        $this->registrarEnBitacora('Unidad eliminada', $unidad->id);
+        return back()->with('success', 'Unidad eliminada.');
     }
 }

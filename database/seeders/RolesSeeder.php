@@ -9,27 +9,39 @@ class RolesSeeder extends Seeder
 {
     public function run(): void
     {
-        $admin = Role::create(['name' => 'Administrador']);
-        $admin->givePermissionTo(Permission::all());
+        // Rol Administrador
+        $admin = Role::firstOrCreate(['name' => 'Administrador']);
+        $admin->syncPermissions(Permission::all()); // Todos los permisos
 
-       $residente = Role::create(['name' => 'Residente']);
-        $residente->givePermissionTo([
-             
+        // Rol Residente
+        $residente = Role::firstOrCreate(['name' => 'Residente']);
+        $residente->syncPermissions([
+            'ver comunicados',
+            'ver notificaciones',
+            'ver agenda',
+            'ver documentos',
+            'ver foro',
+            'ver calificaciones',
         ]);
 
-        $portero = Role::create(['name' => 'Portero']);
-        $portero->givePermissionTo([
-             
+        // Rol Portero
+        $portero = Role::firstOrCreate(['name' => 'Portero']);
+        $portero->syncPermissions([
+            'ver control de acceso',
+            'ver visitas',
+            'ver invitaciones',
+            'ver vigilancia',
         ]);
 
-        $directiva = Role::create(['name' => 'Miembro de Directiva']);
-        $directiva->givePermissionTo([
+        // Rol Directiva
+        $directiva = Role::firstOrCreate(['name' => 'Miembro de Directiva']);
+        $directiva->syncPermissions([
             'ver usuarios',
             'ver roles',
             'ver empleados',
             'ver residentes',
-            'ver bitácora',
-            
+            'ver bitacora',
+            'ver reportes',
         ]);
     }
 }

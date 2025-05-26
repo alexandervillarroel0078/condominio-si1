@@ -87,6 +87,4 @@ Route::get('/prueba-permiso', function () {
 })->middleware(['auth', 'permission:ver-role']);
 
 // Rutas para la gestión de unidades
-Route::resource('unidades', UnidadController::class)
-     ->parameters(['unidades' => 'unidad'])  // <— obliga al placeholder {unidad}
-     ->except(['show']);
+Route::resource('unidades', UnidadController::class);

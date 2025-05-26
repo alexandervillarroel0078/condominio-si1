@@ -10,9 +10,7 @@ class UnidadRequest extends FormRequest
 {
     public function authorize()
     {
-        // Ajusta según tu política de permisos
-        //$user = auth()->user();
-        //return $user && \Illuminate\Support\Facades\Gate::allows('manage', \App\Models\Unidad::class);
+        // Para desarrollo…
         return true;
     }
 
@@ -23,7 +21,8 @@ class UnidadRequest extends FormRequest
         return [
             'codigo'               => [
                                         'required',
-                                        'string','max:50',
+                                        'string',
+                                        'max:50',
                                         Rule::unique('unidades','codigo')->ignore($unidadId),
                                     ],
             'placa'                => ['nullable','string','max:50'],
@@ -33,6 +32,8 @@ class UnidadRequest extends FormRequest
             'personas_por_unidad'  => ['required','integer','min:1'],
             'tiene_mascotas'       => ['required','boolean'],
             'vehiculos'            => ['required','integer','min:0'],
+            // Nueva regla para el FK residente_id
+            'residente_id'         => ['nullable','exists:residentes,id'],
         ];
     }
 }

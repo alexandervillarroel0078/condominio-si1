@@ -10,7 +10,7 @@ use App\Models\User;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-
+use Database\Seeders\UnidadSeeder;
 use Database\Seeders\CargoEmpleadosSeeder;
 
 class DatabaseSeeder extends Seeder
@@ -24,6 +24,7 @@ class DatabaseSeeder extends Seeder
             ClasificadoresSeeder::class,
             CargoEmpleadosSeeder::class,
             EmpleadosSeeder::class,
+            UnidadSeeder::class,
             ResidentesSeeder::class,
 
             PagoSeeder::class,
@@ -31,6 +32,7 @@ class DatabaseSeeder extends Seeder
             CuotaSeeder::class,
             PagoSeeder::class,
             EmpresaExternaSeeder::class,
+            
         ]);
     }
 }

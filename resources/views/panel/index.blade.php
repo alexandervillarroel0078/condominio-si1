@@ -225,7 +225,7 @@
                                     class="list-group-item list-group-item-action">Cargos de Empleados</a>
                                 <a href="{{ route('residentes.index') }}"
                                     class="list-group-item list-group-item-action">Residentes</a>
-                                <a href="#" class="list-group-item list-group-item-action">Unidades</a>
+                                 <a href="{{ route('unidades.index') }}"   class="list-group-item list-group-item-action">Unidades</a>
                                 <a href="#" class="list-group-item list-group-item-action">Empresas Externas</a>
                                 <a href="#" class="list-group-item list-group-item-action">Mantenimiento</a>
                             </ul>

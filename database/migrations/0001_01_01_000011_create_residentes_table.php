@@ -14,6 +14,13 @@ return new class extends Migration {
             $table->string('ci')->unique();
             $table->string('email')->unique();
             $table->string('tipo_residente');
+            
+            // Clave foránea al modelo Unidad
+            $table->foreignId('unidad_id')
+                  ->nullable()
+                  ->constrained('unidades')
+                  ->onDelete('set null');
+            
             $table->timestamps();
         });
     }

@@ -89,7 +89,7 @@
 
                         {{-- Otras secciones --}}
                         <a class="nav-link" href="{{ route('residentes.index') }}">Residentes</a>
-                        <a class="nav-link" href="#">Unidades</a>
+                        <a class="nav-link" href="{{ route('unidades.index') }}">Unidades</a>
                         <a class="nav-link" href="{{ route('empresas.index') }}">Empresas Externas</a>
                         <a class="nav-link" href="#">Mantenimiento</a>
                     </nav>

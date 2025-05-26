@@ -21,7 +21,7 @@ use App\Http\Controllers\PagoController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\TipoGastoController;
 use App\Http\Controllers\GastoController;
-
+use App\Http\Controllers\UnidadController;
 
 //GESTION DE GASTOS
 Route::middleware(['auth'])->group(function () {
@@ -85,3 +85,7 @@ Route::get('/admin', function () {
 Route::get('/prueba-permiso', function () {
     return 'Tienes permiso';
 })->middleware(['auth', 'permission:ver-role']);
+
+// Rutas para la gestión de unidades
+Route::resource('unidades', UnidadController::class)
+     ->except(['show']);

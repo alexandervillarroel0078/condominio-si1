@@ -88,4 +88,5 @@ Route::get('/prueba-permiso', function () {
 
 // Rutas para la gestión de unidades
 Route::resource('unidades', UnidadController::class)
+     ->parameters(['unidades' => 'unidad'])  // <— obliga al placeholder {unidad}
      ->except(['show']);

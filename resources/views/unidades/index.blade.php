@@ -4,9 +4,10 @@
 <div class="container">
     <h2 class="mb-4">Gestión de Unidades</h2>
 
-    @can('crear unidades')
+    {{-- @can('crear unidades') --}}
     <a href="{{ route('unidades.create') }}" class="btn btn-primary mb-3">Nueva Unidad</a>
-    @endcan
+    {{-- @endcan --}}
+
 
     @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
@@ -47,11 +48,11 @@
                 <td>{{ $unidad->tiene_mascotas ? 'Sí' : 'No' }}</td>
                 <td>{{ $unidad->vehiculos }}</td>
                 <td>
-                    @can('editar unidades')
+                  {{--  @can('editar unidades')--}}
                     <a href="{{ route('unidades.edit', $unidad) }}" class="btn btn-sm btn-warning">Editar</a>
-                    @endcan
+                   {{-- @endcan--}}
 
-                    @can('eliminar unidades')
+                  {{--  @can('eliminar unidades')--}}
                     <form action="{{ route('unidades.destroy', $unidad) }}" method="POST" style="display:inline;">
                         @csrf
                         @method('DELETE')
@@ -60,7 +61,7 @@
                             Eliminar
                         </button>
                     </form>
-                    @endcan
+                   {{-- @endcan--}}
                 </td>
             </tr>
             @empty

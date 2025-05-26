@@ -1,6 +1,6 @@
 @extends('layouts.ap')
 
-@can('editar unidades')
+{{-- @can('editar unidades')--}}
 @section('content')
 <div class="container">
     <h2 class="mb-4">Editar Unidad</h2>
@@ -76,4 +76,4 @@
     </form>
 </div>
 @endsection
-@endcan
+{{-- @endcan--}}

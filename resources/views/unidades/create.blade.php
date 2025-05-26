@@ -1,6 +1,6 @@
 @extends('layouts.ap')
 
-@can('crear unidades')
+{{-- @can('crear unidades')--}}
 @section('content')
 <div class="container">
     <h2 class="mb-4">Registrar Nueva Unidad</h2>
@@ -75,4 +75,4 @@
     </form>
 </div>
 @endsection
-@endcan
+{{-- @endcan--}}

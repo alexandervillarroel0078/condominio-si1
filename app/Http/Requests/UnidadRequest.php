@@ -11,8 +11,9 @@ class UnidadRequest extends FormRequest
     public function authorize()
     {
         // Ajusta según tu política de permisos
-        $user = auth()->user();
-        return $user && \Illuminate\Support\Facades\Gate::allows('manage', \App\Models\Unidad::class);
+        //$user = auth()->user();
+        //return $user && \Illuminate\Support\Facades\Gate::allows('manage', \App\Models\Unidad::class);
+        return true;
     }
 
     public function rules()

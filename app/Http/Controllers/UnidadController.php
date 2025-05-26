@@ -11,21 +11,21 @@ use Illuminate\View\View;
 
 class UnidadController extends Controller
 {
-    public function index(Request $request): View
-    {
-        $search = $request->input('search');
+public function index(Request $request): View
+{
+    $search = $request->input('search');
 
-        $unidades = Unidad::when($search, function($query, $search) {
-                $query->where('codigo', 'like', "%{$search}%")
-                      ->orWhere('placa',  'like', "%{$search}%")
-                      ->orWhere('marca',  'like', "%{$search}%");
-            })
-            ->latest()
-            ->paginate(10)
-            ->appends(['search' => $search]); // para que la paginación conserve el parámetro
+    $unidades = Unidad::when($search, function($query, $search) {
+            $query->where('codigo', 'like', "%{$search}%")
+                  ->orWhere('placa',  'like', "%{$search}%")
+                  ->orWhere('marca',  'like', "%{$search}%");
+        })
+        ->orderBy('id', 'asc')     // ← cambio aquí
+        ->paginate(10)
+        ->appends(['search' => $search]);
 
-        return view('unidades.index', compact('unidades'));
-    }
+    return view('unidades.index', compact('unidades'));
+}
 
     public function create(): View
     {

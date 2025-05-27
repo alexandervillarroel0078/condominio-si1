@@ -25,12 +25,12 @@ class DatabaseSeeder extends Seeder
             CargoEmpleadosSeeder::class,
             EmpleadosSeeder::class,
             ResidentesSeeder::class,
-
             PagoSeeder::class,
             TipoCuotaSeeder::class,
             CuotaSeeder::class,
             PagoSeeder::class,
             EmpresaExternaSeeder::class,
+            MantenimientoSeeder::class
         ]);
     }
 }

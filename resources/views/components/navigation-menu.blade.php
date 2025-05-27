@@ -91,7 +91,7 @@
                         <a class="nav-link" href="{{ route('residentes.index') }}">Residentes</a>
                         <a class="nav-link" href="#">Unidades</a>
                         <a class="nav-link" href="{{ route('empresas.index') }}">Empresas Externas</a>
-                        <a class="nav-link" href="#">Mantenimiento</a>
+                        <a class="nav-link" href="{{ route('mantenimientos.index') }}">Mantenimientos</a>
                     </nav>
                 </div>
 

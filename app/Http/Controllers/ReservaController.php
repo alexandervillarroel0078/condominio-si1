@@ -1,0 +1,220 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\AreaComun;
+use App\Models\Reserva;
+use Illuminate\Http\Request;
+use App\Traits\BitacoraTrait;
+use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
+
+class ReservaController extends Controller
+{
+    use BitacoraTrait;
+
+    public function index()
+    {
+        $reservas = Reserva::with(['areaComun', 'residente'])->paginate(10);
+        return view('reservas.index', compact('reservas'));
+    }
+
+    public function create()
+    {
+        $areasComunes = AreaComun::all();
+        return view('reservas.create', compact('areasComunes'));
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate([
+            'area_comun_id' => 'required|exists:area_comuns,id',
+            'fecha' => 'required|date|after_or_equal:today',
+            'hora_inicio' => 'required|date_format:H:i',
+            'hora_fin' => 'required|date_format:H:i|after:hora_inicio',
+            'observacion' => 'nullable|string|max:255',
+            'monto_total' => 'nullable|numeric|min:0',
+        ]);
+
+        // Convertir horas a Carbon para validación precisa
+        $horaInicio = Carbon::createFromFormat('H:i', $request->hora_inicio);
+        $horaFin = Carbon::createFromFormat('H:i', $request->hora_fin);
+
+        // Validar solapamiento
+        $conflict = Reserva::where('area_comun_id', $request->area_comun_id)
+            ->where('fecha', $request->fecha)
+            ->where(function($query) use ($horaInicio, $horaFin) {
+                $query->where(function($q) use ($horaInicio, $horaFin) {
+                    $q->where('hora_inicio', '<', $horaFin->format('H:i:s'))
+                      ->where('hora_fin', '>', $horaInicio->format('H:i:s'));
+                });
+            })->exists();
+
+        if ($conflict) {
+            return back()->withErrors(['La reserva seleccionada se solapa con otra ya existente.'])->withInput();
+        }
+
+        // Obtener el área común para sacar el precio por hora
+        $areaComun = AreaComun::findOrFail($request->area_comun_id);
+
+        // Calcular duración en horas
+        $duracionHoras = $horaFin->diffInMinutes($horaInicio) / 60;
+
+        // Calcular monto total
+        $montoTotal = $duracionHoras * $areaComun->monto;
+
+        // Obtener usuario autenticado
+        $user = Auth::user();
+
+        if (!$user) {
+            return back()->withErrors(['user' => 'No hay usuario autenticado'])->withInput();
+        }
+
+        if (!$user->residente_id) {
+            return back()->withErrors([
+                'residente_id' => 'El usuario no tiene residente asignado. Usuario ID: ' . $user->id
+            ])->withInput();
+        }
+
+        // Crear reserva
+        Reserva::create([
+            'area_comun_id' => $request->area_comun_id,
+            'fecha' => $request->fecha,
+            'hora_inicio' => $request->hora_inicio,
+            'hora_fin' => $request->hora_fin,
+            'observacion' => $request->observacion,
+            'estado' => 'pendiente',
+            'residente_id' => $user->residente_id,
+            'monto_total' => $montoTotal,
+        ]);
+
+        // Registrar en bitácora
+        $this->registrarEnBitacora('Residente Agendo un Area Comun', $request->area_comun_id);
+
+        return redirect()->route('reservas.index')->with('success', 'Reserva creada correctamente.');
+    }
+
+    public function show(Reserva $reserva)
+    {
+        //
+    }
+
+    public function edit(Reserva $reserva)
+    {
+        $areasComunes = AreaComun::all();
+        return view('reservas.edit', compact('reserva', 'areasComunes'));
+    }
+
+    public function update(Request $request, Reserva $reserva)
+    {
+        $request->validate([
+            'area_comun_id' => 'required|exists:area_comuns,id',
+            'fecha' => 'required|date|after_or_equal:today',
+            'hora_inicio' => 'required|date_format:H:i',
+            'hora_fin' => 'required|date_format:H:i|after:hora_inicio',
+            'observacion' => 'nullable|string|max:255',
+            'monto_total' => 'nullable|numeric|min:0',
+        ]);
+
+        $horaInicio = Carbon::createFromFormat('H:i', $request->hora_inicio);
+        $horaFin = Carbon::createFromFormat('H:i', $request->hora_fin);
+
+        // Validar solapamiento pero excluyendo la reserva actual
+        $conflict = Reserva::where('area_comun_id', $request->area_comun_id)
+            ->where('fecha', $request->fecha)
+            ->where('id', '!=', $reserva->id)
+            ->where(function ($query) use ($horaInicio, $horaFin) {
+                $query->where(function ($q) use ($horaInicio, $horaFin) {
+                    $q->where('hora_inicio', '<', $horaFin->format('H:i:s'))
+                      ->where('hora_fin', '>', $horaInicio->format('H:i:s'));
+                });
+            })->exists();
+
+        if ($conflict) {
+            return back()->withErrors(['La reserva seleccionada se solapa con otra ya existente.'])->withInput();
+        }
+
+        $areaComun = AreaComun::findOrFail($request->area_comun_id);
+        $duracionHoras = $horaFin->diffInMinutes($horaInicio) / 60;
+        $montoTotal = $duracionHoras * $areaComun->monto;
+
+        $user = Auth::user();
+        if (!$user) {
+            return back()->withErrors(['user' => 'No hay usuario autenticado'])->withInput();
+        }
+
+        if (!$user->residente_id) {
+            return back()->withErrors([
+                'residente_id' => 'El usuario no tiene residente asignado. Usuario ID: ' . $user->id
+            ])->withInput();
+        }
+
+        // Actualizar la reserva
+        $reserva->update([
+            'area_comun_id' => $request->area_comun_id,
+            'fecha' => $request->fecha,
+            'hora_inicio' => $request->hora_inicio,
+            'hora_fin' => $request->hora_fin,
+            'observacion' => $request->observacion,
+            'monto_total' => $montoTotal,
+        ]);
+
+        $this->registrarEnBitacora('Reserva actualizada ID: ' . $reserva->id);
+
+        return redirect()->route('reservas.index')->with('success', 'Reserva actualizada correctamente.');
+    }
+
+    public function destroy(Reserva $reserva)
+    {
+        try {
+            $reserva->delete();
+
+            $this->registrarEnBitacora('Reserva eliminada ID: ' . $reserva->id);
+
+            return redirect()->route('reservas.index')
+                            ->with('success', 'Reserva eliminada correctamente.');
+        } catch (\Exception $e) {
+            return back()->withErrors(['error' => 'Error al eliminar la reserva: ' . $e->getMessage()]);
+        }
+    }
+
+    public function horasLibres(Request $request)
+    {
+        $area_comun_id = $request->query('area_comun_id');
+        $fecha = $request->query('fecha');
+
+        if (!$area_comun_id || !$fecha) {
+            return response()->json([], 400);
+        }
+
+        // Generar horas posibles en formato Carbon
+        $horasPosibles = [];
+        for ($h = 8; $h <= 20; $h++) {
+            $horasPosibles[] = Carbon::createFromFormat('H:i', sprintf('%02d:00', $h));
+            $horasPosibles[] = Carbon::createFromFormat('H:i', sprintf('%02d:30', $h));
+        }
+
+        // Obtener reservas para ese día y área
+        $reservas = Reserva::where('area_comun_id', $area_comun_id)
+                    ->where('fecha', $fecha)
+                    ->get();
+
+        foreach ($reservas as $reserva) {
+            $horaInicio = Carbon::createFromFormat('H:i:s', $reserva->hora_inicio);
+            $horaFin = Carbon::createFromFormat('H:i:s', $reserva->hora_fin);
+
+            // Filtrar horas que no están dentro del rango reservado
+            $horasPosibles = array_filter($horasPosibles, function ($hora) use ($horaInicio, $horaFin) {
+                return !($hora >= $horaInicio && $hora < $horaFin);
+            });
+        }
+
+        // Convertir objetos Carbon de vuelta a strings 'H:i'
+        $horasPosiblesStrings = array_map(fn($hora) => $hora->format('H:i'), $horasPosibles);
+
+        // Reindexar array
+        $horasPosiblesStrings = array_values($horasPosiblesStrings);
+
+        return response()->json($horasPosiblesStrings);
+    }
+}

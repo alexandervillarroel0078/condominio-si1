@@ -133,8 +133,36 @@
                             </nav>
                         </div>
 
+<<<<<<< HEAD
                         {{-- Otras secciones visibles sin permisos aún --}}
                         <a class="nav-link" href="#">Áreas comunes</a>
+=======
+                        {{-- Gestión de Áreas Comunes --}}
+                    <a  class="nav-link {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? '' : 'collapsed' }}"
+                        href="#" data-bs-toggle="collapse" data-bs-target="#collapseAreas"
+                        aria-expanded="{{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'true' : 'false' }}"
+                        aria-controls="collapseAreas">
+                        <div class="sb-nav-link-icon"><i class="fas fa-swimming-pool"></i></div>
+                        Gestión de Áreas Comunes
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+
+                    <div  class="collapse {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'show' : '' }}"
+                        id="collapseAreas" data-bs-parent="#collapseFinanzas">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            {{-- Catálogo de Áreas --}}
+                            <a  class="nav-link {{ request()->routeIs('areas-comunes.index') ? 'active' : '' }}"
+                                href="{{ route('areas-comunes.index') }}">Catálogo
+                            </a>
+                            {{-- Reservas --}}
+                            <a  class="nav-link {{ request()->routeIs('reservas.index') ? 'active' : '' }}"
+                                href="{{ route('reservas.index') }}">Reservas
+                            </a>
+                        </nav>
+                    </div>
+
+                        {{-- Otras secciones visibles sin permisos aún --}}
+>>>>>>> 10becde60302f675f197aeaf2fbcc6d3acc848aa
                         <a class="nav-link" href="#">Multas y sanciones</a>
                     </nav>
                 </div>

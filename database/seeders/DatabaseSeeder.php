@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\AreaComun;
 use App\Models\CargoEmpleados;
 use App\Models\Cliente;
 use App\Models\Clasificadore;
@@ -24,7 +25,6 @@ class DatabaseSeeder extends Seeder
             ClasificadoresSeeder::class,
             CargoEmpleadosSeeder::class,
             EmpleadosSeeder::class,
-            
             ResidentesSeeder::class,
             UnidadSeeder::class,
             PagoSeeder::class,
@@ -32,8 +32,6 @@ class DatabaseSeeder extends Seeder
             CuotaSeeder::class,
             PagoSeeder::class,
             EmpresaExternaSeeder::class,
-            MantenimientoSeeder::class
-            
         ]);
     }
 }

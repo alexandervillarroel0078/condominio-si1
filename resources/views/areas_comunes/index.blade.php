@@ -4,9 +4,10 @@
 <div class="container">
     <h2 class="mb-4">Catálogo de Áreas Comunes</h2>
 
-    {{--@can('crear areas comunes')--}}
-    <a href="{{ route('areas-comunes.create') }}" class="btn btn-primary mb-3">Nueva Área Común</a>
-    {{--@endcan--}}
+    {{-- Mostrar botón NUEVA ÁREA COMÚN solo si NO es residente --}}
+    @if(auth()->check() && !auth()->user()->residente_id)
+        <a href="{{ route('areas-comunes.create') }}" class="btn btn-primary mb-3">Nueva Área Común</a>
+    @endif
 
     @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
@@ -17,7 +18,7 @@
             <tr>
                 <th>ID</th>
                 <th>Nombre</th>
-                <th>Monto (Bs.)</th>
+                <th>Monto/Hora (Bs.)</th>
                 <th>Estado</th>
                 <th>Acciones</th>
             </tr>
@@ -40,16 +41,16 @@
                     </span>
                 </td>
                 <td>
-                    {{--@can('editar areas comunes')--}}
-                    <a href="{{ route('areas-comunes.edit', $area->id) }}" class="btn btn-sm btn-warning">Editar</a>
-                    {{--@endcan--}}
-                    {{--@can('eliminar areas comunes')--}}
-                    <form action="{{ route('areas-comunes.destroy', $area->id) }}" method="POST" style="display:inline;">
-                        @csrf
-                        @method('DELETE')
-                        <button class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar esta área común?')">Eliminar</button>
-                    </form>
-                    {{--@endcan--}}
+                    {{-- Mostrar botones Editar y Eliminar solo si NO es residente --}}
+                    @if(auth()->check() && !auth()->user()->residente_id)
+                        <a href="{{ route('areas-comunes.edit', $area->id) }}" class="btn btn-sm btn-warning">Editar</a>
+
+                        <form action="{{ route('areas-comunes.destroy', $area->id) }}" method="POST" style="display:inline;">
+                            @csrf
+                            @method('DELETE')
+                            <button class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar esta área común?')">Eliminar</button>
+                        </form>
+                    @endif
                 </td>
             </tr>
             @endforeach

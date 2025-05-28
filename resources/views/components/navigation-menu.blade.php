@@ -158,7 +158,6 @@
                     </div>
 
                         {{-- Otras secciones visibles sin permisos aún --}}
-                        <a class="nav-link" href="#">Áreas comunes</a>
                         <a class="nav-link" href="#">Multas y sanciones</a>
                     </nav>
                 </div>

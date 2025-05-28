@@ -9,6 +9,9 @@ class Reserva extends Model
 {
     use HasFactory;
     protected $table = 'reservas';
+    protected $casts = [
+        'fecha' => 'date',
+    ];
     protected $fillable = [
         'fecha',
         'hora_inicio',
@@ -17,7 +20,7 @@ class Reserva extends Model
         'observacion',
         'monto_total',
         'area_comun_id',
-        'user_id'
+        'residente_id'
     ];
 
     public function areaComun()

@@ -4,8 +4,10 @@
 <div class="container">
     <h2 class="mb-4">Reservas - Áreas Comunes</h2>
 
-    {{-- Botón para agendar una nueva reserva --}}
-    <a href="{{ route('reservas.create') }}" class="btn btn-primary mb-3">Agendar Nueva Reserva</a>
+    {{-- Botón para agendar una nueva reserva SOLO para residentes --}}
+    @if(auth()->check() && auth()->user()->residente_id)
+        <a href="{{ route('reservas.create') }}" class="btn btn-primary mb-3">Agendar Nueva Reserva</a>
+    @endif
 
     @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>
@@ -43,13 +45,14 @@
                 </td>
                 <td>{{ \Carbon\Carbon::parse($reserva->fecha)->format('d/m/Y') }}</td>
                 <td>{{ \Carbon\Carbon::parse($reserva->hora_inicio)->format('H:i') }} - {{ \Carbon\Carbon::parse($reserva->hora_fin)->format('H:i') }}</td>
-
                 <td>{{ $reserva->residente->nombre ?? 'N/D' }}</td>
                 <td>
-                    {{-- Botón Editar --}}
-                    <a href="{{ route('reservas.edit', $reserva->id) }}" class="btn btn-sm btn-warning mb-1">Editar Reserva</a>
+                    {{-- Botón Editar SOLO para residentes --}}
+                    @if(auth()->check() && auth()->user()->residente_id)
+                        <a href="{{ route('reservas.edit', $reserva->id) }}" class="btn btn-sm btn-warning mb-1">Editar Reserva</a>
+                    @endif
 
-                    {{-- Formulario para Eliminar --}}
+                    {{-- Botón Eliminar (decide si lo quieres para todos o también solo para residentes) --}}
                     <form action="{{ route('reservas.destroy', $reserva->id) }}" method="POST" style="display:inline;">
                         @csrf
                         @method('DELETE')
@@ -61,7 +64,6 @@
         </tbody>
     </table>
 
-    {{-- Paginación --}}
     <div class="mt-3">
         {{ $reservas->links() }}
     </div>

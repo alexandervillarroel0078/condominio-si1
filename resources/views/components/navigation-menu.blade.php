@@ -70,10 +70,7 @@
                         @endcan
                         @can('ver empresas')
                         <a class="nav-link" href="{{ route('empresas.index') }}">Empresas Externas</a>
-                        @endcan
-                        @can('ver mantenimiento')
-                        <a class="nav-link" href="#">Mantenimiento</a>
-                        @endcan
+                        <a class="nav-link" href="{{ route('mantenimientos.index') }}">Mantenimientos</a>
                     </nav>
                 </div>
 

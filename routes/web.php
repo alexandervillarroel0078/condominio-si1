@@ -14,7 +14,7 @@ use App\Http\Controllers\residenteController;
 use App\Http\Controllers\bitacoraController;
 use App\Http\Controllers\empleadoController;
 use App\Http\Controllers\CargoEmpleadoController;
-
+use App\Http\Controllers\MantenimientosController;
 use App\Http\Controllers\CuotaController;
 use App\Http\Controllers\TipoCuotaController;
 use App\Http\Controllers\PagoController;
@@ -64,6 +64,8 @@ Route::resources([
     'residentes' => residenteController::class,
 ]);
 Route::resource('empleados', App\Http\Controllers\empleadoController::class);
+
+Route::resource('mantenimientos', App\Http\Controllers\MantenimientoController::class);
 
 Route::get('/login', [LoginController::class, 'index'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);

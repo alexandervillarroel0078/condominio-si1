@@ -3,51 +3,12 @@
         <div class="sb-sidenav-menu">
             <div class="nav">
                 <div class="sb-sidenav-menu-heading">Inicio</div>
+
                 <a class="nav-link" href="{{ route('panel') }}">
                     <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                     Inicio
                 </a>
-                <!--
-                <div class="sb-sidenav-menu-heading">Módulos</div>
-
-                <a class="nav-link" href="{{ route('users.index') }}">
-                    <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
-                    Usuarios
-                </a>
-
-                <a class="nav-link" href="{{ route('roles.index') }}">
-                    <div class="sb-nav-link-icon"><i class="fa-solid fa-person-circle-plus"></i></div>
-                    Roles
-                </a>
-
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseEmpleados" aria-expanded="false" aria-controls="collapseEmpleados">
-                    <div class="sb-nav-link-icon"><i class="fas fa-id-card"></i></div>
-                    Empleados
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
-                <div class="collapse" id="collapseEmpleados" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="{{ route('empleados.index') }}">Lista de Empleados</a>
-                        <a class="nav-link" href="{{ route('cargos.index') }}">Cargos de Empleados</a>
-                    </nav>
-                </div>
-
-
-                <a class="nav-link" href="{{ route('residentes.index') }}">
-                    <div class="sb-nav-link-icon"><i class="fas fa-building"></i></div>
-                    Residentes
-                </a>
-
-                <a class="nav-link" href="{{ route('bitacora.index') }}">
-                    <div class="sb-nav-link-icon"><i class="fas fa-book"></i></div>
-                    Bitácora
-                </a>
-
-                <a class="nav-link" href="{{ route('logout') }}">
-                    <div class="sb-nav-link-icon"><i class="fa fa-sign-out" aria-hidden="true"></i></div>
-                    Salir
-                </a>
-   -->
+                <!-- -->
                 <div class="sb-sidenav-menu-heading">Módulos2</div>
 
 
@@ -57,16 +18,22 @@
                     Usuarios
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
+
+
                 <div class="collapse" id="collapseUsuarios" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
+                        @can('ver usuarios')
+
                         <a class="nav-link" href="{{ route('users.index') }}">Usuarios</a>
+                        @endcan
+                        @can('ver roles')
+
                         <a class="nav-link" href="{{ route('roles.index') }}">Roles y Permisos</a>
+                        @endcan
                     </nav>
                 </div>
-
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
-                    data-bs-target="#collapseAdministracion" aria-expanded="false"
-                    aria-controls="collapseAdministracion">
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseAdministracion"
+                    aria-expanded="false" aria-controls="collapseAdministracion">
                     <div class="sb-nav-link-icon"><i class="fas fa-cogs"></i></div>
                     Administración Interna
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
@@ -75,39 +42,57 @@
                     <nav class="sb-sidenav-menu-nested nav">
 
                         {{-- Empleados con submenú --}}
-                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
-                            data-bs-target="#collapseEmpleados" aria-expanded="false" aria-controls="collapseEmpleados">
+                        <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseEmpleados"
+                            aria-expanded="false" aria-controls="collapseEmpleados">
                             Empleados
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
                         <div class="collapse" id="collapseEmpleados">
                             <nav class="sb-sidenav-menu-nested nav">
+                                @can('ver ver empleado')
+
                                 <a class="nav-link" href="{{ route('empleados.index') }}">Lista de Empleados</a>
+                                @endcan
                                 <a class="nav-link" href="{{ route('cargos.index') }}">Cargos de Empleados</a>
+
                             </nav>
                         </div>
 
                         {{-- Otras secciones --}}
+                        {{-- Ver Residentes --}}
+                        @can('ver residentes')
                         <a class="nav-link" href="{{ route('residentes.index') }}">Residentes</a>
-                        <a class="nav-link" href="#">Unidades</a>
+                        @endcan
+
+                        {{-- Ver Unidades --}}
+                        @can('ver unidades')
+                        <a class="nav-link" href="{{ route('unidades.index') }}">Unidades</a>
+                        @endcan
+
+                        {{-- Ver Empresas Externas --}}
+                        @can('ver empresas')
                         <a class="nav-link" href="{{ route('empresas.index') }}">Empresas Externas</a>
-                        <a class="nav-link" href="#">Mantenimiento</a>
+                        @endcan
+
+                        {{-- Ver Mantenimientos --}}
+                        @can('ver mantenimiento')
+                        <a class="nav-link" href="{{ route('mantenimientos.index') }}">Mantenimientos</a>
+                        @endcan
                     </nav>
                 </div>
 
-                {{-- Finanzas y Áreas Comunes --}}
-
-                <a class="nav-link {{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') ? '' : 'collapsed' }}"
-                    href="#" data-bs-toggle="collapse" data-bs-target="#collapseFinanzas"
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseFinanzas"
                     aria-expanded="{{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') ? 'true' : 'false' }}"
                     aria-controls="collapseFinanzas">
                     <div class="sb-nav-link-icon"><i class="fas fa-hand-holding-usd"></i></div>
                     Finanzas y Áreas Comunes
                     <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                 </a>
-                <div class="collapse {{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') ? 'show' : '' }}"
-                    id="collapseFinanzas" data-bs-parent="#sidenavAccordion">
+                <div class="collapse {{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') || request()->routeIs('pagos.*') || request()->routeIs('gastos.*') || request()->routeIs('tipo-gastos.*') ? 'show' : '' }}"
+                    id="collapseFinanzas">
                     <nav class="sb-sidenav-menu-nested nav">
+
+                        {{-- Submenú: Cuotas y Pagos --}}
                         <a class="nav-link {{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') ? '' : 'collapsed' }}"
                             href="#" data-bs-toggle="collapse" data-bs-target="#collapseCuotas"
                             aria-expanded="{{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') ? 'true' : 'false' }}"
@@ -117,16 +102,20 @@
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
                         <div class="collapse {{ request()->routeIs('cuotas.*') || request()->routeIs('tipos-cuotas.*') || request()->routeIs('pagos.*') ? 'show' : '' }}"
-                            id="collapseCuotas" data-bs-parent="#collapseFinanzas">
+                            id="collapseCuotas">
                             <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link {{ request()->routeIs('cuotas.index') ? 'active' : '' }}"
-                                    href="{{ route('cuotas.index') }}">Lista de Cuotas</a>
-                                <a class="nav-link {{ request()->routeIs('tipos-cuotas.index') ? 'active' : '' }}"
-                                    href="{{ route('tipos-cuotas.index') }}">Tipos de Cuotas</a>
-                                <a class="nav-link {{ request()->routeIs('pagos.index') ? 'active' : '' }}"
-                                    href="{{ route('pagos.index') }}">Pagos Realizados</a>
+
+                                @can('ver cuotas')
+                                <a class="nav-link {{ request()->routeIs('cuotas.index') ? 'active' : '' }}" href="{{ route('cuotas.index') }}">Lista de Cuotas</a>
+                                <a class="nav-link {{ request()->routeIs('tipos-cuotas.index') ? 'active' : '' }}" href="{{ route('tipos-cuotas.index') }}">Tipos de Cuotas</a>
+                                @endcan
+                                @can('ver pagos')
+                                <a class="nav-link {{ request()->routeIs('pagos.index') ? 'active' : '' }}" href="{{ route('pagos.index') }}">Pagos Realizados</a>
+                                @endcan
                             </nav>
                         </div>
+
+                        {{-- Submenú: Gestión de Gastos --}}
                         <a class="nav-link {{ request()->routeIs('tipo-gastos.*') || request()->routeIs('gastos.*') ? '' : 'collapsed' }}"
                             href="#" data-bs-toggle="collapse" data-bs-target="#collapseGastos"
                             aria-expanded="{{ request()->routeIs('tipo-gastos.*') || request()->routeIs('gastos.*') ? 'true' : 'false' }}"
@@ -136,15 +125,11 @@
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
                         <div class="collapse {{ request()->routeIs('tipo-gastos.*') || request()->routeIs('gastos.*') ? 'show' : '' }}"
-                            id="collapseGastos" data-bs-parent="#sidenavAccordion">
-                            <nav class="sb-sidenav-menu-nested nav">
-                                <a class="nav-link {{ request()->routeIs('gastos.index') ? 'active' : '' }}"
-                                    href="{{ route('gastos.index') }}">Lista de Gastos</a>
-                                <a class="nav-link {{ request()->routeIs('tipo-gastos.index') ? 'active' : '' }}"
-                                    href="{{ route('tipo-gastos.index') }}">
-                                    Tipos de Gastos
-                                </a>
+                            id="collapseGastos">
 
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link {{ request()->routeIs('gastos.index') ? 'active' : '' }}" href="{{ route('gastos.index') }}">Lista de Gastos</a>
+                                <a class="nav-link {{ request()->routeIs('tipo-gastos.index') ? 'active' : '' }}" href="{{ route('tipo-gastos.index') }}">Tipos de Gastos</a>
                             </nav>
                         </div>
 
@@ -172,8 +157,13 @@
                         </nav>
                     </div>
 
+                        {{-- Otras secciones visibles sin permisos aún --}}
+                        <a class="nav-link" href="#">Áreas comunes</a>
+                        <a class="nav-link" href="#">Multas y sanciones</a>
                     </nav>
                 </div>
+
+
 
 
 
@@ -193,6 +183,9 @@
                         <a class="nav-link" href="#">Notificaciones</a>
                     </nav>
                 </div>
+
+
+                {{-- Seguridad y Accesos --}}
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
                     data-bs-target="#collapseSeguridad" aria-expanded="false" aria-controls="collapseSeguridad">
                     <div class="sb-nav-link-icon"><i class="fas fa-shield-alt"></i></div>
@@ -207,6 +200,10 @@
                         <a class="nav-link" href="#">Seguridad y Vigilancia</a>
                     </nav>
                 </div>
+
+
+                {{-- Comunidad y Reportes --}}
+
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
                     data-bs-target="#collapseComunidad" aria-expanded="false" aria-controls="collapseComunidad">
                     <div class="sb-nav-link-icon"><i class="fas fa-users-cog"></i></div>
@@ -222,15 +219,25 @@
                         <a class="nav-link" href="#">Foro Vecinal</a>
                     </nav>
                 </div>
+
+
+
+
+                {{-- Bitácora --}}
+                @can('ver bitacora')
                 <a class="nav-link" href="{{ route('bitacora.index') }}">
                     <div class="sb-nav-link-icon"><i class="fas fa-book"></i></div>
                     Bitácora
                 </a>
+                @endcan
 
+
+                {{-- Salir (Logout) --}}
                 <a class="nav-link" href="{{ route('logout') }}">
                     <div class="sb-nav-link-icon"><i class="fa fa-sign-out" aria-hidden="true"></i></div>
                     Salir
                 </a>
+
 
             </div>
         </div>

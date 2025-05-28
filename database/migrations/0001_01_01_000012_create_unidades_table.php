@@ -21,6 +21,13 @@ return new class extends Migration
             $table->integer('personas_por_unidad')->default(1);
             $table->boolean('tiene_mascotas')->default(false);
             $table->integer('vehiculos')->default(0);
+
+            // FK al residente asignado
+            $table->foreignId('residente_id')
+                  ->nullable()
+                  ->constrained('residentes')
+                  ->onDelete('set null');
+
             $table->timestamps();
         });
     }
@@ -30,6 +37,11 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('unidades', function (Blueprint $table) {
+            $table->dropForeign(['residente_id']);
+            $table->dropColumn('residente_id');
+        });
+
         Schema::dropIfExists('unidades');
     }
 };

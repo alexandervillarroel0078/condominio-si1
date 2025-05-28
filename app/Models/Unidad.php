@@ -5,15 +5,18 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Models\Residente;
 
 class Unidad extends Model
 {
     use HasFactory;
 
-    // Si tu tabla se llama de forma distinta, descomenta y ajusta:
+    /**
+     * Los atributos que pueden asignarse masivamente.
+     *
+     * @var array<int,string>
+     */
     protected $table = 'unidades';
-
-    // Campos que se pueden asignar masivamente
     protected $fillable = [
         'codigo',
         'placa',
@@ -23,22 +26,27 @@ class Unidad extends Model
         'personas_por_unidad',
         'tiene_mascotas',
         'vehiculos',
-    ];
-
-    // Conversión de tipos
-    protected $casts = [
-        'capacidad'           => 'integer',
-        'personas_por_unidad' => 'integer',
-        'tiene_mascotas'      => 'boolean',
-        'vehiculos'           => 'integer',
+        'residente_id',
     ];
 
     /**
-     * Una Unidad puede tener muchos Residentes.
+     * Conversiones de tipo para atributos.
+     *
+     * @var array<string,string>
      */
-    public function residentes()
+    protected $casts = [
+        'capacidad'            => 'integer',
+        'personas_por_unidad'  => 'integer',
+        'tiene_mascotas'       => 'boolean',
+        'vehiculos'            => 'integer',
+    ];
+
+    /**
+     * Cada Unidad pertenece a un único Residente.
+     */
+    public function residente()
     {
-        return $this->hasMany(Residente::class);
+        return $this->belongsTo(Residente::class);
     }
 
     /**

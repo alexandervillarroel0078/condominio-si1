@@ -1,3 +1,4 @@
+{{-- resources/views/unidades/index.blade.php --}}
 @extends('layouts.ap')
 
 @section('content')
@@ -8,14 +9,17 @@
     <a href="{{ route('unidades.create') }}" class="btn btn-primary mb-3">Nueva Unidad</a>
     {{-- @endcan --}}
 
-
     @if(session('success'))
-    <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
     <form method="GET" action="{{ route('unidades.index') }}" class="mb-3">
         <div class="input-group">
-            <input type="text" name="search" class="form-control" placeholder="Buscar por código, placa o marca" value="{{ request('search') }}">
+            <input type="text"
+                   name="search"
+                   class="form-control"
+                   placeholder="Buscar por código, placa, marca o residente"
+                   value="{{ request('search') }}">
             <button class="btn btn-outline-primary" type="submit">Buscar</button>
         </div>
     </form>
@@ -25,6 +29,7 @@
             <tr>
                 <th>ID</th>
                 <th>Código</th>
+                <th>Residente</th>         {{-- nueva columna --}}
                 <th>Placa</th>
                 <th>Marca</th>
                 <th>Capacidad</th>
@@ -36,10 +41,15 @@
             </tr>
         </thead>
         <tbody>
-            @forelse($unidades as $unidad)
+        @forelse($unidades as $unidad)
             <tr>
                 <td>{{ $unidad->id }}</td>
                 <td>{{ $unidad->codigo }}</td>
+                <td>
+                  {{ $unidad->residente
+                       ? $unidad->residente->nombreCompleto
+                       : '-' }}
+                </td>
                 <td>{{ $unidad->placa ?? '-' }}</td>
                 <td>{{ $unidad->marca ?? '-' }}</td>
                 <td>{{ $unidad->capacidad }}</td>
@@ -48,12 +58,21 @@
                 <td>{{ $unidad->tiene_mascotas ? 'Sí' : 'No' }}</td>
                 <td>{{ $unidad->vehiculos }}</td>
                 <td>
-                  {{--  @can('editar unidades')--}}
-                    <a href="{{ route('unidades.edit', $unidad) }}" class="btn btn-sm btn-warning">Editar</a>
-                   {{-- @endcan--}}
+                    
+                    {{-- @can('ver unidades') --}}
+                    <a href="{{ route('unidades.show', $unidad->id) }}" class="btn btn-sm btn-info">Ver</a>
+                    {{-- @endcan --}}
+                    {{-- @can('editar unidades') --}}
+                    <a href="{{ route('unidades.edit', $unidad) }}"
+                       class="btn btn-sm btn-warning">
+                        Editar
+                    </a>
+                    {{-- @endcan --}}
 
-                  {{--  @can('eliminar unidades')--}}
-                    <form action="{{ route('unidades.destroy', $unidad) }}" method="POST" style="display:inline;">
+                    {{-- @can('eliminar unidades') --}}
+                    <form action="{{ route('unidades.destroy', $unidad) }}"
+                          method="POST"
+                          style="display:inline;">
                         @csrf
                         @method('DELETE')
                         <button class="btn btn-sm btn-danger"
@@ -61,14 +80,14 @@
                             Eliminar
                         </button>
                     </form>
-                   {{-- @endcan--}}
+                    {{-- @endcan --}}
                 </td>
             </tr>
-            @empty
+        @empty
             <tr>
-                <td colspan="10" class="text-center">No hay unidades registradas.</td>
+                <td colspan="11" class="text-center">No hay unidades registradas.</td>
             </tr>
-            @endforelse
+        @endforelse
         </tbody>
     </table>
 

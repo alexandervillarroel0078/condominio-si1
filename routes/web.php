@@ -14,7 +14,7 @@ use App\Http\Controllers\residenteController;
 use App\Http\Controllers\bitacoraController;
 use App\Http\Controllers\empleadoController;
 use App\Http\Controllers\CargoEmpleadoController;
-
+use App\Http\Controllers\MantenimientosController;
 use App\Http\Controllers\CuotaController;
 use App\Http\Controllers\TipoCuotaController;
 use App\Http\Controllers\PagoController;
@@ -65,6 +65,8 @@ Route::resources([
 ]);
 Route::resource('empleados', App\Http\Controllers\empleadoController::class);
 
+Route::resource('mantenimientos', App\Http\Controllers\MantenimientoController::class);
+
 Route::get('/login', [LoginController::class, 'index'])->name('login');
 Route::post('/login', [LoginController::class, 'login']);
 Route::get('/logout', [logoutController::class, 'logout'])->name('logout');
@@ -87,6 +89,4 @@ Route::get('/prueba-permiso', function () {
 })->middleware(['auth', 'permission:ver-role']);
 
 // Rutas para la gestión de unidades
-Route::resource('unidades', UnidadController::class)
-     ->parameters(['unidades' => 'unidad'])  // <— obliga al placeholder {unidad}
-     ->except(['show']);
+Route::resource('unidades', UnidadController::class);

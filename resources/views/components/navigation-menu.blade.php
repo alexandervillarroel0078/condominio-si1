@@ -147,6 +147,31 @@
 
                             </nav>
                         </div>
+
+                        {{-- Gestión de Áreas Comunes --}}
+                    <a  class="nav-link {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? '' : 'collapsed' }}"
+                        href="#" data-bs-toggle="collapse" data-bs-target="#collapseAreas"
+                        aria-expanded="{{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'true' : 'false' }}"
+                        aria-controls="collapseAreas">
+                        <div class="sb-nav-link-icon"><i class="fas fa-swimming-pool"></i></div>
+                        Gestión de Áreas Comunes
+                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                    </a>
+
+                    <div  class="collapse {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'show' : '' }}"
+                        id="collapseAreas" data-bs-parent="#collapseFinanzas">
+                        <nav class="sb-sidenav-menu-nested nav">
+                            {{-- Catálogo de Áreas --}}
+                            <a  class="nav-link {{ request()->routeIs('areas-comunes.index') ? 'active' : '' }}"
+                                href="{{ route('areas-comunes.index') }}">Catálogo
+                            </a>
+                            {{-- Reservas --}}
+                            <a  class="nav-link {{ request()->routeIs('reservas.index') ? 'active' : '' }}"
+                                href="{{ route('reservas.index') }}">Reservas
+                            </a>
+                        </nav>
+                    </div>
+
                     </nav>
                 </div>
 

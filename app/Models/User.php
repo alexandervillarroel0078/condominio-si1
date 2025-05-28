@@ -15,7 +15,10 @@ class User extends Authenticatable
     public function empleado(){
         return $this->belongsTo(Empleado::class);
     }
-
+    public function residente()
+    {
+        return $this->belongsTo(Residente::class);
+    }
     public function bitacoras(){
         return $this->hasMany(Bitacora::class);
     }

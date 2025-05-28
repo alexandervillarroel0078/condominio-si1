@@ -21,6 +21,18 @@ use App\Http\Controllers\PagoController;
 use App\Http\Controllers\EmpresaController;
 use App\Http\Controllers\TipoGastoController;
 use App\Http\Controllers\GastoController;
+use App\Http\Controllers\AreaComunController;
+use App\Http\Controllers\ReservaController;
+
+
+//gestion de areas comunes
+Route::middleware(['auth'])->group(function () {
+    Route::resource('areas-comunes', AreaComunController::class)->parameters([
+    'areas-comunes' => 'areaComun'
+    ]);
+    Route::resource('reservas', ReservaController::class);
+});
+Route::get('/api/horas-libres', [ReservaController::class, 'horasLibres']);
 
 
 //GESTION DE GASTOS

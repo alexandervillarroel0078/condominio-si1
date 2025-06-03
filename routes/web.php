@@ -2,17 +2,17 @@
 
 use App\Http\Controllers\LoginController;
 use App\Http\Controllers\clienteController;
-use App\Http\Controllers\homeController;
-use App\Http\Controllers\logoutController;
+use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LogoutController;
 use App\Http\Controllers\RoleController;
-use App\Http\Controllers\userController;
-use App\Http\Controllers\usuarioController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ServicioController;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Controllers\residenteController;
-use App\Http\Controllers\bitacoraController;
-use App\Http\Controllers\empleadoController;
+use App\Http\Controllers\ResidenteController;
+use App\Http\Controllers\BitacoraController;
+use App\Http\Controllers\EmpleadoController;
 use App\Http\Controllers\CargoEmpleadoController;
 use App\Http\Controllers\MantenimientosController;
 use App\Http\Controllers\CuotaController;

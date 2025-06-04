@@ -25,7 +25,6 @@ class DatabaseSeeder extends Seeder
             ClasificadoresSeeder::class,
             CargoEmpleadosSeeder::class,
             EmpleadosSeeder::class,
-
             ResidentesSeeder::class,
             UnidadSeeder::class,
             PagoSeeder::class,

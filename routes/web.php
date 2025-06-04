@@ -8,7 +8,6 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UsuarioController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\ServicioController;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\ResidenteController;
 use App\Http\Controllers\BitacoraController;

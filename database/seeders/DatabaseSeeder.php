@@ -32,6 +32,9 @@ class DatabaseSeeder extends Seeder
             CuotaSeeder::class,
             PagoSeeder::class,
             EmpresaExternaSeeder::class,
+            MantenimientoSeeder::class,
+            AreaComunSeeder::class,
+            ReservaSeeder::class,
         ]);
     }
 }

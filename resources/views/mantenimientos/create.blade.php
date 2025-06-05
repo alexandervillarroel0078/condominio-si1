@@ -59,7 +59,7 @@
             <label for="empresa_id" class="form-label">Empresa (opcional)</label>
             <select name="empresaExterna_id" class="form-select">
                 <option value="">-- Ninguna --</option>
-                 @foreach($empresasExternas as $empresa)
+                 @foreach($empresas  as $empresa)
                     <option value="{{ $empresa->id }}" {{ old('empresaExterna_id') == $empresa->id ? 'selected' : '' }}>
                         {{ $empresa->nombre }}
                     </option>

@@ -23,19 +23,30 @@ use App\Http\Controllers\GastoController;
 use App\Http\Controllers\AreaComunController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\UnidadController;
+use App\Http\Controllers\VisitaController; 
 
-
-//gestion de areas comunes
+// gestión de áreas comunes y reservas
 Route::middleware(['auth'])->group(function () {
     Route::resource('areas-comunes', AreaComunController::class)->parameters([
-    'areas-comunes' => 'areaComun'
+        'areas-comunes' => 'areaComun'
     ]);
     Route::resource('reservas', ReservaController::class);
 });
 Route::get('/api/horas-libres', [ReservaController::class, 'horasLibres']);
 
+// GESTIÓN DE VISITAS
+Route::middleware(['auth'])->group(function () {
+    Route::resource('visitas', VisitaController::class);
+    
+    // Rutas específicas para guardias
+    Route::post('/visitas/validar-codigo', [VisitaController::class, 'validarCodigo'])->name('visitas.validar-codigo');
+    Route::post('/visitas/{visita}/entrada', [VisitaController::class, 'registrarEntrada'])->name('visitas.entrada');
+    Route::post('/visitas/{visita}/salida', [VisitaController::class, 'registrarSalida'])->name('visitas.salida');
+    Route::get('/panel-guardia', [VisitaController::class, 'panelGuardia'])->name('visitas.panel-guardia');
+    Route::get('/buscar-codigo', [VisitaController::class, 'buscarPorCodigo'])->name('visitas.buscar-codigo');
+});
 
-//GESTION DE GASTOS
+// GESTIÓN DE GASTOS
 Route::middleware(['auth'])->group(function () {
     Route::resource('tipo-gastos', TipoGastoController::class);
 });
@@ -43,16 +54,12 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('gastos', GastoController::class);
 });
 
-
 Route::middleware(['auth'])->group(function () {
     Route::resource('pagos', PagoController::class)->only(['index', 'create', 'store']);
 });
 Route::resource('empresas', \App\Http\Controllers\EmpresaExternaController::class);
-
 Route::resource('tipos-cuotas', TipoCuotaController::class);
-
 Route::resource('cuotas', CuotaController::class);
-
 Route::get('/cuotasypagos', [CuotaController::class, 'index'])->name('cuotas.index');
 
 Route::prefix('empleados/cargo')->group(function () {
@@ -63,7 +70,6 @@ Route::prefix('empleados/cargo')->group(function () {
     Route::put('/{id}', [CargoEmpleadoController::class, 'update'])->name('cargos.update');
     Route::delete('/{id}', [CargoEmpleadoController::class, 'destroy'])->name('cargos.destroy');
 });
-
 
 Route::get('/', [homeController::class, 'index'])->name('panel');
 Route::get('/panel', [homeController::class, 'index']);
@@ -76,7 +82,6 @@ Route::resources([
     'residentes' => residenteController::class,
 ]);
 Route::resource('empleados', App\Http\Controllers\empleadoController::class);
-
 Route::resource('mantenimientos', App\Http\Controllers\MantenimientoController::class);
 
 Route::get('/login', [LoginController::class, 'index'])->name('login');
@@ -100,5 +105,4 @@ Route::get('/prueba-permiso', function () {
     return 'Tienes permiso';
 })->middleware(['auth', 'permission:ver-role']);
 
-// Rutas para la gestión de unidades
 Route::resource('unidades', UnidadController::class);

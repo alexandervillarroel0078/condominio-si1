@@ -194,8 +194,8 @@
                 <div class="collapse" id="collapseSeguridad" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="#">Control de Acceso</a>
-                        <a class="nav-link" href="#">Visitas</a>
-                        <a class="nav-link" href="#">Invitación de Visitas</a>
+                        <a class="nav-link" href="{{ route('visitas.index') }}">Visitas</a>
+                        <a class="nav-link" href="{{ route('visitas.panel-guardia') }}">Panel Guardia</a>
                         <a class="nav-link" href="#">Seguridad y Vigilancia</a>
                     </nav>
                 </div>

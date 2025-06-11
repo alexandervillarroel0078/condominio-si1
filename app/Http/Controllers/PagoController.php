@@ -6,6 +6,9 @@ use App\Models\Pago;
 use App\Models\Cuota;
 use Illuminate\Http\Request;
 use App\Traits\BitacoraTrait;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+use Stripe\Stripe;
+use Stripe\Checkout\Session;
 
 class PagoController extends Controller
 {
@@ -13,9 +16,16 @@ class PagoController extends Controller
 
     public function index(Request $request)
     {
+        $pagos = $this->filtrarPagos($request);
+        return view('pagos.index', compact('pagos'));
+    }
+
+    private function filtrarPagos(Request $request)
+    {
         $query = \App\Models\Pago::with(['cuota.residente', 'user']);
 
-        // Filtro por búsqueda (nombre del residente o ID de cuota)
+        // 🔥 Se eliminó el filtro por usuario autenticado
+
         if ($request->filled('search')) {
             $search = $request->search;
 
@@ -30,12 +40,10 @@ class PagoController extends Controller
             });
         }
 
-        // Filtro por método de pago
         if ($request->filled('metodo')) {
             $query->where('metodo', $request->metodo);
         }
 
-        // Filtro por tiempo
         switch ($request->filtro_tiempo) {
             case 'fecha':
                 if ($request->filled('fecha_desde') && $request->filled('fecha_hasta')) {
@@ -66,16 +74,125 @@ class PagoController extends Controller
                 break;
         }
 
-        $pagos = $query->orderByDesc('fecha_pago')->paginate(10);
-
-        return view('pagos.index', compact('pagos'));
+        return $query->orderByDesc('fecha_pago')->paginate(10);
     }
 
-    public function create()
+
+
+    public function misCuotas()
     {
-        $cuotas = Cuota::where('estado', '!=', 'pagado')->get();
-        return view('pagos.create', compact('cuotas'));
+        $residente = auth()->user()->residente;
+
+        if (!$residente) {
+            abort(403, 'Solo los residentes pueden acceder a sus cuotas.');
+        }
+
+        $cuotas = \App\Models\Cuota::with('pagos')
+            ->where('residente_id', $residente->id)
+            ->orderByDesc('fecha_vencimiento')
+            ->paginate(10);
+
+        return view('pagos.mis_cuotas', compact('cuotas'));
     }
+
+    public function create($cuotaId)
+    {
+        $cuota = Cuota::with('pagos')->findOrFail($cuotaId);
+
+        if (auth()->user()->residente_id !== $cuota->residente_id) {
+            abort(403);
+        }
+
+        // Contenido del QR codificado
+        $contenidoQr = urlencode("Pago de cuota\nMonto: Bs {$cuota->monto}\nConcepto: {$cuota->concepto}");
+
+        // URL del QR generado desde API externa (qrserver.com)
+        $qrBase64 = "https://api.qrserver.com/v1/create-qr-code/?data={$contenidoQr}&size=200x200";
+
+        return view('pagos.opciones_pago', compact('cuota', 'qrBase64'));
+    }
+
+
+    public function pagoQR(Request $request)
+    {
+        $request->validate([
+            'cuota_id' => 'required|exists:cuotas,id',
+            'comprobante' => 'required|image|max:2048',
+        ]);
+
+        $cuota = Cuota::findOrFail($request->cuota_id);
+
+        if (auth()->user()->residente_id !== $cuota->residente_id) {
+            abort(403, 'No autorizado.');
+        }
+
+        $ruta = $request->file('comprobante')->store('comprobantes', 'public');
+
+        Pago::create([
+            'cuota_id' => $cuota->id,
+            'user_id' => auth()->id(),
+            'monto_pagado' => $cuota->monto,
+            'fecha_pago' => now(),
+            'metodo' => 'QR',
+            'estado' => 'pendiente',
+            'comprobante' => $ruta,
+        ]);
+
+        return redirect()->route('pagos.mis_cuotas')->with('success', 'Comprobante enviado. Esperando validación.');
+    }
+
+    public function pagoStripe(Request $request)
+    {
+        $cuota = Cuota::findOrFail($request->cuota_id);
+
+        if (auth()->user()->residente_id !== $cuota->residente_id) {
+            abort(403);
+        }
+
+        Stripe::setApiKey(config('services.stripe.secret'));
+
+        $session = Session::create([
+            'payment_method_types' => ['card'],
+            'line_items' => [[
+                'price_data' => [
+                    'currency' => 'bob', // o 'usd' si lo manejarás así
+                    'product_data' => [
+                        'name' => 'Pago de cuota: ' . $cuota->concepto,
+                    ],
+                    'unit_amount' => $cuota->monto * 100, // Stripe usa centavos
+                ],
+                'quantity' => 1,
+            ]],
+            'mode' => 'payment',
+            'success_url' => route('pagos.stripe.success', ['cuota' => $cuota->id]),
+            'cancel_url' => route('pagos.stripe.cancel'),
+        ]);
+
+        return redirect($session->url);
+    }
+
+    public function stripeSuccess($cuotaId)
+    {
+        Pago::create([
+            'cuota_id' => $cuotaId,
+            'user_id' => auth()->id(),
+            'monto_pagado' => Cuota::find($cuotaId)->monto,
+            'fecha_pago' => now(),
+            'metodo' => 'Stripe',
+            'estado' => 'aprobado',
+        ]);
+
+        return redirect()->route('pagos.mis_cuotas')->with('success', 'Pago realizado exitosamente con Stripe.');
+    }
+public function comprobante(Pago $pago)
+{
+    // Validación de seguridad
+    if (auth()->id() !== $pago->user_id && !auth()->user()->hasRole('admin')) {
+        abort(403);
+    }
+
+    return view('pagos.comprobante_html', compact('pago'));
+}
 
     public function store(Request $request)
     {

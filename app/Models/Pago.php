@@ -14,17 +14,32 @@ class Pago extends Model
         'monto_pagado',
         'fecha_pago',
         'metodo',
+        'estado',
+        'comprobante',
         'observacion',
         'user_id',
     ];
 
-    public function cuota()
-    {
-        return $this->belongsTo(Cuota::class);
-    }
+public function cuota()
+{
+    return $this->belongsTo(Cuota::class, 'cuota_id');
+}
 
-    public function user()
+public function user()
+{
+    return $this->belongsTo(User::class, 'user_id');
+}
+
+
+    public function residente()
     {
-        return $this->belongsTo(User::class);
+        return $this->hasOneThrough(
+            Residente::class,
+            Cuota::class,
+            'id',
+            'id',
+            'cuota_id',
+            'residente_id'
+        );
     }
 }

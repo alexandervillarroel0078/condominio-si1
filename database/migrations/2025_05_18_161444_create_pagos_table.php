@@ -11,7 +11,9 @@ return new class extends Migration {
             $table->foreignId('cuota_id')->constrained()->onDelete('cascade');
             $table->decimal('monto_pagado', 10, 2);
             $table->date('fecha_pago');
-            $table->string('metodo')->nullable(); // efectivo, transferencia, etc.
+            $table->string('metodo')->nullable(); // efectivo, QR, Stripe, etc.
+            $table->string('estado')->default('pendiente'); // pendiente, aprobado, rechazado
+            $table->string('comprobante')->nullable(); // imagen del comprobante QR
             $table->text('observacion')->nullable();
             $table->foreignId('user_id')->nullable()->constrained()->onDelete('set null');
             $table->timestamps();

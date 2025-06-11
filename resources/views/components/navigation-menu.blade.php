@@ -112,6 +112,14 @@
                                 @can('ver pagos')
                                 <a class="nav-link {{ request()->routeIs('pagos.index') ? 'active' : '' }}" href="{{ route('pagos.index') }}">Pagos Realizados</a>
                                 @endcan
+                                @auth
+                                @if(auth()->user()->residente)
+                                <a class="nav-link {{ request()->routeIs('pagos.mis_cuotas') ? 'active' : '' }}" href="{{ route('pagos.mis_cuotas') }}">
+                                    Mis Cuotas
+                                </a>
+                                @endif
+                                @endauth
+
                             </nav>
                         </div>
 
@@ -134,28 +142,28 @@
                         </div>
 
                         {{-- Gestión de Áreas Comunes --}}
-                    <a  class="nav-link {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? '' : 'collapsed' }}"
-                        href="#" data-bs-toggle="collapse" data-bs-target="#collapseAreas"
-                        aria-expanded="{{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'true' : 'false' }}"
-                        aria-controls="collapseAreas">
-                        <div class="sb-nav-link-icon"><i class="fas fa-swimming-pool"></i></div>
-                        Gestión de Áreas Comunes
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
+                        <a class="nav-link {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? '' : 'collapsed' }}"
+                            href="#" data-bs-toggle="collapse" data-bs-target="#collapseAreas"
+                            aria-expanded="{{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'true' : 'false' }}"
+                            aria-controls="collapseAreas">
+                            <div class="sb-nav-link-icon"><i class="fas fa-swimming-pool"></i></div>
+                            Gestión de Áreas Comunes
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
 
-                    <div  class="collapse {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'show' : '' }}"
-                        id="collapseAreas" data-bs-parent="#collapseFinanzas">
-                        <nav class="sb-sidenav-menu-nested nav">
-                            {{-- Catálogo de Áreas --}}
-                            <a  class="nav-link {{ request()->routeIs('areas-comunes.index') ? 'active' : '' }}"
-                                href="{{ route('areas-comunes.index') }}">Catálogo
-                            </a>
-                            {{-- Reservas --}}
-                            <a  class="nav-link {{ request()->routeIs('reservas.index') ? 'active' : '' }}"
-                                href="{{ route('reservas.index') }}">Reservas
-                            </a>
-                        </nav>
-                    </div>
+                        <div class="collapse {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'show' : '' }}"
+                            id="collapseAreas" data-bs-parent="#collapseFinanzas">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                {{-- Catálogo de Áreas --}}
+                                <a class="nav-link {{ request()->routeIs('areas-comunes.index') ? 'active' : '' }}"
+                                    href="{{ route('areas-comunes.index') }}">Catálogo
+                                </a>
+                                {{-- Reservas --}}
+                                <a class="nav-link {{ request()->routeIs('reservas.index') ? 'active' : '' }}"
+                                    href="{{ route('reservas.index') }}">Reservas
+                                </a>
+                            </nav>
+                        </div>
 
                         {{-- Otras secciones visibles sin permisos aún --}}
                         <a class="nav-link" href="#">Multas y sanciones</a>
@@ -194,8 +202,8 @@
                 <div class="collapse" id="collapseSeguridad" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="#">Control de Acceso</a>
-                        <a class="nav-link" href="#">Visitas</a>
-                        <a class="nav-link" href="#">Invitación de Visitas</a>
+                        <a class="nav-link" href="{{ route('visitas.index') }}">Visitas</a>
+                        <a class="nav-link" href="{{ route('visitas.panel-guardia') }}">Panel Guardia</a>
                         <a class="nav-link" href="#">Seguridad y Vigilancia</a>
                     </nav>
                 </div>

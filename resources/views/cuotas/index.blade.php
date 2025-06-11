@@ -56,7 +56,7 @@
                 <thead>
                     <tr>
                         <th>ID</th>
-                        <th>Unidad</th>
+                        <!-- <th>Unidad</th> -->
                         <th>Residente</th>
                         <th>Mes</th>
                         <th>Monto</th>
@@ -68,7 +68,7 @@
                     @foreach ($cuotas as $cuota)
                     <tr>
                         <td>{{ $cuota->id }}</td>
-                        <td>{{ $cuota->unidad->codigo ?? 'N/A' }}</td>
+                        <!-- <td>{{ $cuota->unidad->codigo ?? 'N/A' }}</td> -->
                         <td>{{ $cuota->residente->nombre_completo ?? 'N/A' }}</td>
                         <td>{{ \Carbon\Carbon::parse($cuota->fecha)->format('F Y') }}</td>
                         <td>${{ number_format($cuota->monto, 2) }}</td>

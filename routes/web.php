@@ -54,13 +54,49 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('gastos', GastoController::class);
 });
 
-Route::middleware(['auth'])->group(function () {
-    Route::resource('pagos', PagoController::class)->only(['index', 'create', 'store']);
-});
+ 
 Route::resource('empresas', \App\Http\Controllers\EmpresaExternaController::class);
 Route::resource('tipos-cuotas', TipoCuotaController::class);
 Route::resource('cuotas', CuotaController::class);
 Route::get('/cuotasypagos', [CuotaController::class, 'index'])->name('cuotas.index');
+
+Route::get('pagos/{pago}/comprobante', [PagoController::class, 'comprobante'])->name('pagos.comprobante');
+
+Route::middleware(['auth'])->group(function () {
+    Route::resource('pagos', PagoController::class)->only(['index',  'store']);
+});
+Route::get('/pagos/create/{cuota?}', [PagoController::class, 'create'])->name('pagos.create');
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/mis-cuotas', [PagoController::class, 'misCuotas'])->name('pagos.mis_cuotas');
+    Route::get('/pagos/create/{cuota}', [PagoController::class, 'create'])->name('pagos.create');
+    Route::post('/pagos/qr', [PagoController::class, 'pagoQR'])->name('pagos.qr');
+    Route::post('/pagos/stripe', [PagoController::class, 'pagoStripe'])->name('pagos.stripe');
+});
+
+Route::get('/stripe/success/{cuota}', [PagoController::class, 'stripeSuccess'])->name('pagos.stripe.success');
+Route::get('/stripe/cancel', function () {
+    return redirect()->route('pagos.mis_cuotas')->with('error', 'Pago cancelado.');
+})->name('pagos.stripe.cancel');
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 Route::prefix('empleados/cargo')->group(function () {
     Route::get('/', [CargoEmpleadoController::class, 'index'])->name('cargos.index');

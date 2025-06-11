@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers;
 
 use App\Models\Visita;
@@ -7,16 +8,40 @@ use App\Models\Residente;
 use App\Models\Bitacora;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 
 class VisitaController extends Controller
 {
+    protected $rol;
+
+    public function __construct()
+    {
+        $this->middleware(function ($request, $next) {
+            $this->rol = Auth::user()->roles->pluck('name')->join(', ');
+            return $next($request);
+        });
+    }
+
     // Lista de visitas (para administrador/guardia)
     public function index(Request $request)
     {
-        $query = Visita::with(['residente', 'userEntrada', 'userSalida']);
+        $user = Auth::user();
+        $rol = $this->rol;
 
-        // Si hay búsqueda, aplicar filtros
+        // Filtrar visitas según el rol del usuario
+        if ($rol == 'Residente') {
+            // Residente solo ve sus propias visitas
+            $query = Visita::with(['residente', 'userEntrada', 'userSalida'])
+                        ->whereHas('residente', function($q) use ($user) {
+                            $q->where('email', $user->email);
+                        });
+        } else {
+            // Admin/Guardia ven todas las visitas
+            $query = Visita::with(['residente', 'userEntrada', 'userSalida']);
+        }
+
+        // Aplicar filtros de búsqueda
         if ($request->filled('search')) {
             $search = $request->search;
             
@@ -27,7 +52,7 @@ class VisitaController extends Controller
                 ->orWhere('placa_vehiculo', 'LIKE', "%{$search}%")
                 ->orWhere('motivo', 'LIKE', "%{$search}%")
                 ->orWhereHas('residente', function($subQ) use ($search) {
-                    $subQ->where('nombre_visitante', 'LIKE', "%{$search}%");
+                    $subQ->where('nombre_completo', 'LIKE', "%{$search}%");
                 });
             });
         }
@@ -40,13 +65,31 @@ class VisitaController extends Controller
     // Formulario para crear visita (residente)
     public function create()
     {
-        $residentes = Residente::all();
+        $user = Auth::user();
+        $rol = $this->rol;
+        
+        
+        if ($rol == 'Residente') {
+            // Residente solo puede crear visitas para sí mismo
+            $residentes = Residente::where('email', $user->email)->get();
+            if ($residentes->count() == 0) {  
+                // Mostrar todos los emails para comparar
+                $todosLosEmails = Residente::pluck('email')->toArray();
+            } else {
+                $residente = $residentes->first();
+            }
+        } else {
+            // Admin puede crear para cualquier residente
+            $residentes = Residente::all();
+        }     
         return view('visitas.create', compact('residentes'));
     }
 
     // Guardar nueva visita (residente)
     public function store(Request $request)
     {
+        $user = Auth::user();
+        
         $request->validate([
             'residente_id' => 'required|exists:residentes,id',
             'nombre_visitante' => 'required|string|max:255',
@@ -56,6 +99,17 @@ class VisitaController extends Controller
             'fecha_fin' => 'required|date|after:fecha_inicio',
             'placa_vehiculo' => 'nullable|string|max:20'
         ]);
+
+        // Verificar que el residente solo pueda crear visitas para sí mismo
+        $rol = $this->rol;
+        if ($rol == 'Residente') {
+            $residente = Residente::find($request->residente_id);
+            if ($residente->email !== $user->email) {
+                return redirect()->back()
+                    ->with('error', 'Solo puedes crear visitas para ti mismo')
+                    ->withInput();
+            }
+        }
 
         $visita = Visita::create([
             'residente_id' => $request->residente_id,
@@ -79,26 +133,70 @@ class VisitaController extends Controller
         return redirect()->route('visitas.show', $visita)
             ->with('success', 'Visita registrada. Código: ' . $visita->codigo);
     }
-    // Formulario para editar visita
-    public function edit(Visita $visita)
+
+    // Ver detalles de visita
+    public function show($id)
     {
+        $user = Auth::user();
+        $visita = Visita::findOrFail($id);
+        
+        // Control de acceso: residente solo sus visitas
+        $rol = $this->rol;
+        if ($rol == 'Residente') {
+            if ($visita->residente->email !== $user->email) {
+                abort(403, 'Esta visita no te pertenece');
+            }
+        }
+        
+        $visita->load(['residente', 'userEntrada', 'userSalida']);
+        return view('visitas.show', compact('visita'));
+    }
+
+    // Formulario para editar visita
+    public function edit($id)
+    {
+        $user = Auth::user();
+        $visita = Visita::findOrFail($id);
+        
         // Solo permitir editar visitas pendientes
         if ($visita->estado !== 'pendiente') {
             return redirect()->route('visitas.show', $visita)
                 ->with('error', 'Solo se pueden editar visitas pendientes');
         }
 
-        $residentes = Residente::all();
+        // Control de acceso: residente solo sus visitas
+        $rol = $this->rol;
+        if ($rol == 'Residente') {
+            if ($visita->residente->email !== $user->email) {
+                abort(403, 'Esta visita no te pertenece');
+            }
+            $residentes = Residente::where('email', $user->email)->get();
+        } else {
+            // Admin puede editar cualquier visita
+            $residentes = Residente::all();
+        }
+        
         return view('visitas.edit', compact('visita', 'residentes'));
     }
 
     // Actualizar visita
-    public function update(Request $request, Visita $visita)
+    public function update(Request $request, $id)
     {
+        $user = Auth::user();
+        $visita = Visita::findOrFail($id);
+        
         // Solo permitir actualizar visitas pendientes
         if ($visita->estado !== 'pendiente') {
             return redirect()->route('visitas.show', $visita)
                 ->with('error', 'Solo se pueden editar visitas pendientes');
+        }
+
+        // Control de acceso: residente solo sus visitas
+        $rol = $this->rol;
+        if ($rol == 'Residente') {
+            if ($visita->residente->email !== $user->email) {
+                abort(403, 'Esta visita no te pertenece');
+            }
         }
 
         $request->validate([
@@ -131,20 +229,72 @@ class VisitaController extends Controller
         return redirect()->route('visitas.show', $visita)
             ->with('success', 'Visita actualizada correctamente');
     }
-    // Ver detalles de visita
-    public function show(Visita $visita)
+
+    // Eliminar visita
+    public function destroy($id)
     {
-        $visita->load(['residente', 'userEntrada', 'userSalida']);
-        return view('visitas.show', compact('visita'));
+        $user = Auth::user();
+        $visita = Visita::findOrFail($id);
+        
+        // Solo permitir eliminar visitas pendientes o rechazadas
+        if (!in_array($visita->estado, ['pendiente', 'rechazada'])) {
+            return redirect()->back()
+                ->with('error', 'No se puede eliminar una visita en curso o finalizada');
+        }
+
+        // Control de acceso: residente solo sus visitas
+        $rol = $this->rol;
+        if ($rol == 'Residente') {
+            if ($visita->residente->email !== $user->email) {
+                abort(403, 'Esta visita no te pertenece');
+            }
+        }
+
+        $nombreVisitante = $visita->nombre_visitante;
+        $ciVisitante = $visita->ci_visitante;
+        $codigo = $visita->codigo;
+
+        // Registrar eliminación en bitácora antes de eliminar
+        $this->registrarBitacora(
+            'ELIMINAR_VISITA',
+            "Visita eliminada - Visitante: {$nombreVisitante}, CI: {$ciVisitante}, Código: {$codigo}",
+            $visita->id
+        );
+
+        $visita->delete();
+
+        return redirect()->route('visitas.index')
+            ->with('success', 'Visita eliminada correctamente');
     }
+
     // Mostrar formulario de validación de código
     public function mostrarValidarCodigo()
     {
+        $user = Auth::user();
+        
+        // Solo guardia y admin pueden validar códigos
+        $rol = $this->rol;
+        if ($rol == 'Residente') {
+            abort(403, 'No tienes permisos para validar códigos');
+        }
+        
         return view('visitas.validar-codigo');
     }
+
     // Validar código y mostrar datos (guardia)
     public function validarCodigo(Request $request)
     {
+        $user = Auth::user();
+        
+        // Solo guardia y admin pueden validar códigos
+        $rol = $this->rol;
+        if ($rol == 'Residente') {
+            return response()->json([
+                'success' => false,
+                'message' => 'No tienes permisos para validar códigos'
+            ]);
+        }
+        
         $request->validate([
             'codigo' => 'required|string|size:6',
             'ci_visitante' => 'required|string'
@@ -205,8 +355,17 @@ class VisitaController extends Controller
     }
 
     // Registrar entrada (guardia)
-    public function registrarEntrada(Request $request, Visita $visita)
+    public function registrarEntrada(Request $request, $id)
     {
+        $user = Auth::user();
+        $visita = Visita::findOrFail($id);
+        
+        // Solo guardia y admin pueden registrar entradas
+        $rol = $this->rol;
+        if ($rol == 'Residente') {
+            return redirect()->back()->with('error', 'No tienes permisos para registrar entradas');
+        }
+        
         if ($visita->estado !== 'pendiente') {
             return redirect()->back()->with('error', 'Esta visita ya fue procesada');
         }
@@ -229,8 +388,17 @@ class VisitaController extends Controller
     }
 
     // Registrar salida (guardia)
-    public function registrarSalida(Request $request, Visita $visita)
+    public function registrarSalida(Request $request, $id)
     {
+        $user = Auth::user();
+        $visita = Visita::findOrFail($id);
+        
+        // Solo guardia y admin pueden registrar salidas
+        $rol = $this->rol;
+        if ($rol == 'Residente') {
+            return redirect()->back()->with('error', 'No tienes permisos para registrar salidas');
+        }
+        
         if ($visita->estado !== 'en_curso') {
             return redirect()->back()->with('error', 'No se puede registrar salida');
         }
@@ -256,9 +424,17 @@ class VisitaController extends Controller
     // Panel de control para guardia
     public function panelGuardia()
     {
+        $user = Auth::user();
+        
+        // Solo guardia y admin pueden acceder al panel
+        $rol = $this->rol;
+        if ($rol == 'Residente') {
+            abort(403, 'No tienes permisos para acceder al Panel de Guardia');
+        }
+        
         // Solo traer visitas en curso que SÍ tengan hora_entrada registrada
         $visitasEnCurso = Visita::enCurso()
-            ->whereNotNull('hora_entrada')  // Agregar esta línea
+            ->whereNotNull('hora_entrada')
             ->with('residente')
             ->get();
             
@@ -268,6 +444,28 @@ class VisitaController extends Controller
             ->get();
 
         return view('visitas.panel-guardia', compact('visitasEnCurso', 'visitasPendientes'));
+    }
+
+    // Buscar visitas por código (API para guardia)
+    public function buscarPorCodigo(Request $request)
+    {
+        $user = Auth::user();
+        
+        // Solo guardia y admin pueden buscar códigos
+        $rol = $this->rol;
+        if ($rol == 'Residente') {
+            return response()->json(['success' => false, 'message' => 'No tienes permisos']);
+        }
+        
+        $visita = Visita::where('codigo', $request->codigo)
+            ->with('residente')
+            ->first();
+
+        if (!$visita) {
+            return response()->json(['success' => false, 'message' => 'Código no encontrado']);
+        }
+
+        return response()->json(['success' => true, 'visita' => $visita]);
     }
 
     // Generar código de 6 dígitos único
@@ -280,54 +478,15 @@ class VisitaController extends Controller
         return $codigo;
     }
 
-    // Buscar visitas por código (API para guardia)
-    public function buscarPorCodigo(Request $request)
-    {
-        $visita = Visita::where('codigo', $request->codigo)
-            ->with('residente')
-            ->first();
-
-        if (!$visita) {
-            return response()->json(['success' => false, 'message' => 'Código no encontrado']);
-        }
-
-        return response()->json(['success' => true, 'visita' => $visita]);
-    }
-    // Eliminar visita
-    public function destroy(Visita $visita)
-    {
-        // Solo permitir eliminar visitas pendientes o rechazadas
-        if (!in_array($visita->estado, ['pendiente', 'rechazada'])) {
-            return redirect()->back()
-                ->with('error', 'No se puede eliminar una visita en curso o finalizada');
-        }
-
-        $nombreVisitante = $visita->nombre_visitante;
-        $ciVisitante = $visita->ci_visitante;
-        $codigo = $visita->codigo;
-
-        // Registrar eliminación en bitácora antes de eliminar
-        $this->registrarBitacora(
-            'ELIMINAR_VISITA',
-            "Visita eliminada - Visitante: {$nombreVisitante}, CI: {$ciVisitante}, Código: {$codigo}",
-            $visita->id
-        );
-
-        $visita->delete();
-
-        return redirect()->route('visitas.index')
-            ->with('success', 'Visita eliminada correctamente');
-    }
     // Método privado para registrar en bitácora
-private function registrarBitacora($accion, $descripcion, $id_operacion = null)
-{
-    Bitacora::create([
-        'user_id' => Auth::id(),
-        'accion' => $accion . ' - ' . $descripcion, // Combinar acción y descripción
-        'fecha_hora' => Carbon::now(),
-        'id_operacion' => $id_operacion,
-        'ip' => request()->ip(),
-       
-    ]);
-}
+    private function registrarBitacora($accion, $descripcion, $id_operacion = null)
+    {
+        Bitacora::create([
+            'user_id' => Auth::id(),
+            'accion' => $accion . ' - ' . $descripcion,
+            'fecha_hora' => Carbon::now(),
+            'id_operacion' => $id_operacion,
+            'ip' => request()->ip(),
+        ]);
+    }
 }

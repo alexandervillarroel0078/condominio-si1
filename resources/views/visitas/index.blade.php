@@ -1,18 +1,22 @@
-
-{{-- resources/views/visitas/index.blade.php --}}
 @extends('layouts.ap')
 
 @section('content')
 <div class="container">
-    <h2 class="mb-4">Gestión de Visitas</h2>
+    <h2 class="mb-4">
+        @if(auth()->user()->roles->pluck('name')->join(', ') == 'Residente')
+            Mis Visitas
+        @else
+            Gestión de Visitas
+        @endif
+    </h2>
 
-    {{-- @can('crear visitas') --}}
+    {{-- Botón Nueva Visita - Todos pueden crear --}}
     <a href="{{ route('visitas.create') }}" class="btn btn-primary mb-3">Nueva Visita</a>
-    {{-- @endcan --}}
 
-    {{-- @can('panel guardia') --}}
-    <a href="{{ route('visitas.panel-guardia') }}" class="btn btn-secondary mb-3">Panel Guardia</a>
-    {{-- @endcan --}}
+    {{-- Panel Guardia - Solo para guardia/admin --}}
+    @if(auth()->user()->roles->pluck('name')->join(', ') != 'Residente')
+        <a href="{{ route('visitas.panel-guardia') }}" class="btn btn-secondary mb-3">Panel Guardia</a>
+    @endif
 
     @if(session('success'))
         <div class="alert alert-success">{{ session('success') }}</div>
@@ -36,7 +40,10 @@
                 <th>Código</th>
                 <th>Visitante</th>
                 <th>CI</th>
-                <th>Residente</th>
+                {{-- Ocultar columna Residente si es residente --}}
+                @if(auth()->user()->roles->pluck('name')->join(', ') != 'Residente')
+                    <th>Residente</th>
+                @endif
                 <th>Motivo</th>
                 <th>Estado</th>
                 <th>Fecha Inicio</th>
@@ -52,11 +59,14 @@
                 <td><strong class="text-primary">{{ $visita->codigo }}</strong></td>
                 <td>{{ $visita->nombre_visitante }}</td>
                 <td>{{ $visita->ci_visitante }}</td>
-                <td>
-                  {{ $visita->residente
-                       ? $visita->residente->nombre_completo
-                       : '-' }}
-                </td>
+                {{-- Mostrar residente solo para admin/guardia --}}
+                @if(auth()->user()->roles->pluck('name')->join(', ') != 'Residente')
+                    <td>
+                      {{ $visita->residente
+                           ? $visita->residente->nombre_completo
+                           : '-' }}
+                    </td>
+                @endif
                 <td>{{ Str::limit($visita->motivo, 30) }}</td>
                 <td>
                     @switch($visita->estado)
@@ -78,32 +88,32 @@
                 <td>{{ $visita->fecha_fin->format('d/m/Y H:i') }}</td>
                 <td>{{ $visita->placa_vehiculo ?? '-' }}</td>
                 <td>
-                    
-                    {{-- @can('ver visitas') --}}
+                    {{-- Botón Ver - Todos pueden ver --}}
                     <a href="{{ route('visitas.show', $visita->id) }}" class="btn btn-sm btn-info">Ver</a>
-                    {{-- @endcan --}}
                     
+                    {{-- Acciones para visitas pendientes --}}
                     @if($visita->estado == 'pendiente')
-                        {{-- @can('editar visitas') --}}
+                        
+                        {{-- Editar - Residente solo sus visitas, Admin todas --}}
                         <a href="{{ route('visitas.edit', $visita) }}"
                            class="btn btn-sm btn-warning">
                             Editar
                         </a>
-                        {{-- @endcan --}}
 
-                        {{-- @can('registrar entrada') --}}
-                        <form action="{{ route('visitas.entrada', $visita) }}"
-                              method="POST"
-                              style="display:inline;">
-                            @csrf
-                            <button class="btn btn-sm btn-success"
-                                    onclick="return confirm('¿Registrar entrada del visitante?')">
-                                Entrada
-                            </button>
-                        </form>
-                        {{-- @endcan --}}
+                        {{-- Registrar entrada - Solo guardia/admin --}}
+                        @if(auth()->user()->roles->pluck('name')->join(', ') != 'Residente')
+                            <form action="{{ route('visitas.entrada', $visita) }}"
+                                  method="POST"
+                                  style="display:inline;">
+                                @csrf
+                                <button class="btn btn-sm btn-success"
+                                        onclick="return confirm('¿Registrar entrada del visitante?')">
+                                    Entrada
+                                </button>
+                            </form>
+                        @endif
 
-                        {{-- @can('eliminar visitas') --}}
+                        {{-- Eliminar - Solo residente/admin --}}
                         <form action="{{ route('visitas.destroy', $visita) }}"
                               method="POST"
                               style="display:inline;">
@@ -114,11 +124,10 @@
                                 Eliminar
                             </button>
                         </form>
-                        {{-- @endcan --}}
                     @endif
 
-                    @if($visita->estado == 'en_curso')
-                        {{-- @can('registrar salida') --}}
+                    {{-- Registrar salida - Solo guardia/admin --}}
+                    @if($visita->estado == 'en_curso' && auth()->user()->roles->pluck('name')->join(', ') != 'Residente')
                         <form action="{{ route('visitas.salida', $visita) }}"
                               method="POST"
                               style="display:inline;">
@@ -128,13 +137,18 @@
                                 Salida
                             </button>
                         </form>
-                        {{-- @endcan --}}
                     @endif
                 </td>
             </tr>
         @empty
             <tr>
-                <td colspan="11" class="text-center">No hay visitas registradas.</td>
+                <td colspan="{{ auth()->user()->roles->pluck('name')->join(', ') == 'Residente' ? '10' : '11' }}" class="text-center">
+                    @if(auth()->user()->roles->pluck('name')->join(', ') == 'Residente')
+                        No tienes visitas registradas.
+                    @else
+                        No hay visitas registradas.
+                    @endif
+                </td>
             </tr>
         @endforelse
         </tbody>

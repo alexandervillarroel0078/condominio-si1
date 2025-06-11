@@ -23,6 +23,14 @@ use App\Http\Controllers\GastoController;
 use App\Http\Controllers\AreaComunController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\UnidadController;
+use App\Http\Controllers\MultaController;
+
+//gestion de multas
+Route::middleware(['auth'])->group(function () {
+    Route::resource('multas', MultaController::class)->parameters([
+        'multas' => 'multa'
+    ]);
+});
 
 
 //gestion de areas comunes

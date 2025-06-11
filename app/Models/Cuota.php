@@ -33,8 +33,12 @@ protected $fillable = [
         return $this->hasMany(Pago::class);
     }
     public function tipoCuota()
-{
+    {
     return $this->belongsTo(TipoCuota::class);
-}
+    }
+    public function multas()
+    {
+        return $this->hasMany(Multa::class);
+    }
 
 }

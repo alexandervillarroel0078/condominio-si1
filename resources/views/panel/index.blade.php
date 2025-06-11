@@ -202,9 +202,12 @@
                                 href="{{ route('tipo-gastos.index') }}">Tipos Gastos del Condominio</a>
                             <a href="{{ route('gastos.index') }}"
                                 class="list-group-item list-group-item-action">Gastos del Condominio</a>
-                            <a href="#" class="list-group-item list-group-item-action">Reservas de Áreas
-                                Comunes</a>
-                            <a href="#" class="list-group-item list-group-item-action">Multas y Sanciones</a>
+                            <a href="{{ route('areas-comunes.index') }}"
+                                class="list-group-item list-group-item-action">Catalogo de Areas Comunes</a>
+                            <a href="{{ route('reservas.index') }}"
+                                class="list-group-item list-group-item-action">Reservas de Áreas Comunes</a>
+                            <a href="{{ route('multas.index') }}"
+                                class="list-group-item list-group-item-action">Panel de Multas</a>
                         </ul>
                     </div>
                 </div>

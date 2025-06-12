@@ -77,7 +77,7 @@
                             <div class="btn-group" role="group">
                                 {{-- Botón “Pagar” para residentes y empleados --}}
                                 @if(auth()->check() && (auth()->user()->residente_id || auth()->user()->empleado_id) && $multa->estado == 'pendiente')
-                                    <a href="{{ route('pagos.create', ['multa_id' => $multa->id]) }}"
+                                    <a href="{{ route('pagos.create.multa', ['multa' => $multa->id]) }}"
                                        class="btn btn-success btn-sm me-1">
                                        Pagar
                                     </a>

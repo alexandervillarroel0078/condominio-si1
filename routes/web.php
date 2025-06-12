@@ -42,14 +42,14 @@ Route::middleware(['auth'])->group(function () {
 });
 Route::get('/api/horas-libres', [ReservaController::class, 'horasLibres']);
 
-// GESTIÓN DE VISITAS 
+// GESTIÓN DE VISITAS
 Route::middleware(['auth'])->group(function () {
     Route::resource('visitas', VisitaController::class);
-    
+
     // Ruta para mostrar formulario de validación
     Route::get('/validar-codigo', [VisitaController::class, 'mostrarValidarCodigo'])
         ->name('visitas.mostrar-validar-codigo');
-    
+
     // Rutas específicas para guardias (control en controlador)
     Route::post('/visitas/validar-codigo', [VisitaController::class, 'validarCodigo'])
         ->name('visitas.validar-codigo');
@@ -71,22 +71,28 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('gastos', GastoController::class);
 });
 
- 
+
 Route::resource('empresas', \App\Http\Controllers\EmpresaExternaController::class);
 Route::resource('tipos-cuotas', TipoCuotaController::class);
 Route::resource('cuotas', CuotaController::class);
 Route::get('/cuotasypagos', [CuotaController::class, 'index'])->name('cuotas.index');
 
-Route::get('pagos/{pago}/comprobante', [PagoController::class, 'comprobante'])->name('pagos.comprobante');
+// Pago de una cuota
+Route::get('/pagos/create/cuota/{cuota}', [PagoController::class, 'createCuota'])
+     ->name('pagos.create.cuota')
+     ->middleware('auth');
+
+// Pago de una multa
+Route::get('/pagos/create/multa/{multa}', [PagoController::class, 'createMulta'])
+     ->name('pagos.create.multa')
+     ->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('pagos', PagoController::class)->only(['index',  'store']);
 });
-Route::get('/pagos/create/{cuota?}', [PagoController::class, 'create'])->name('pagos.create');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/mis-cuotas', [PagoController::class, 'misCuotas'])->name('pagos.mis_cuotas');
-    Route::get('/pagos/create/{cuota}', [PagoController::class, 'create'])->name('pagos.create');
     Route::post('/pagos/qr', [PagoController::class, 'pagoQR'])->name('pagos.qr');
     Route::post('/pagos/stripe', [PagoController::class, 'pagoStripe'])->name('pagos.stripe');
 });

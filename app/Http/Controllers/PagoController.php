@@ -9,6 +9,8 @@ use App\Traits\BitacoraTrait;
 use SimpleSoftwareIO\QrCode\Facades\QrCode;
 use Stripe\Stripe;
 use Stripe\Checkout\Session;
+use App\Models\Multa;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PagoController extends Controller
 {
@@ -93,22 +95,51 @@ class PagoController extends Controller
         return view('pagos.mis_cuotas', compact('cuotas'));
     }
 
-    public function create($cuotaId)
+public function createCuota($cuotaId)
     {
         $cuota = Cuota::with('pagos')->findOrFail($cuotaId);
 
+        // Solo el residente propietario puede pagar
         if (auth()->user()->residente_id !== $cuota->residente_id) {
             abort(403);
         }
 
-        // Contenido del QR codificado
+        // Generar contenido QR
         $contenidoQr = urlencode("Pago de cuota\nMonto: Bs {$cuota->monto}\nConcepto: {$cuota->concepto}");
+        $qrBase64    = "https://api.qrserver.com/v1/create-qr-code/?data={$contenidoQr}&size=200x200";
 
-        // URL del QR generado desde API externa (qrserver.com)
-        $qrBase64 = "https://api.qrserver.com/v1/create-qr-code/?data={$contenidoQr}&size=200x200";
-
-        return view('pagos.opciones_pago', compact('cuota', 'qrBase64'));
+        return view('pagos.opciones_pago', [
+            'entidad' => $cuota,
+            'qrBase64'=> $qrBase64
+        ]);
     }
+
+    /**
+     * Mostrar opciones de pago para una multa
+     */
+    public function createMulta($multaId)
+    {
+        $multa = Multa::with('pagos')->findOrFail($multaId);
+
+        // Solo el residente o empleado al que corresponde puede pagar
+        $user = auth()->user();
+        $esResidente = $user->residente_id && $user->residente_id === $multa->residente_id;
+        $esEmpleado  = $user->empleado_id  && $user->empleado_id  === $multa->empleado_id;
+
+        if (! ($esResidente || $esEmpleado) ) {
+            abort(403);
+        }
+
+        // Generar contenido QR
+        $contenidoQr = urlencode("Pago de multa\nMotivo: {$multa->motivo}\nMonto: Bs {$multa->monto}");
+        $qrBase64    = "https://api.qrserver.com/v1/create-qr-code/?data={$contenidoQr}&size=200x200";
+
+        return view('pagos.opciones_pago', [
+            'entidad' => $multa,
+            'qrBase64'=> $qrBase64
+        ]);
+    }
+
 
     public function pagoQR(Request $request)
     {

@@ -34,7 +34,7 @@
                 <td>{{ $cuota->fecha_vencimiento }}</td>
                 <td>
                     @if(!$cuota->estaPagada())
-                    <a href="{{ route('pagos.create', $cuota->id) }}" class="btn btn-sm btn-success">Pagar</a>
+                    <a href="{{ route('pagos.create.cuota', ['cuota' => $cuota->id]) }}" class="btn btn-sm btn-success">Pagar</a>
                     @else
                     @if($cuota->estaPagada())
                     <a href="{{ route('pagos.comprobante', $cuota->pagos->first()->id) }}" class="btn btn-sm btn-outline-primary" target="_blank">

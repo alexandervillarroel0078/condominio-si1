@@ -18,11 +18,16 @@ class Pago extends Model
         'comprobante',
         'observacion',
         'user_id',
+        'multa_id',
     ];
 
 public function cuota()
 {
     return $this->belongsTo(Cuota::class, 'cuota_id');
+}
+public function multa()
+{
+    return $this->belongsTo(Multa::class, 'multa_id');
 }
 
 public function user()

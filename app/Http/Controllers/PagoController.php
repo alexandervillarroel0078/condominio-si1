@@ -95,7 +95,7 @@ class PagoController extends Controller
         return view('pagos.mis_cuotas', compact('cuotas'));
     }
 
-public function createCuota($cuotaId)
+    public function createCuota($cuotaId)
     {
         $cuota = Cuota::with('pagos')->findOrFail($cuotaId);
 
@@ -110,7 +110,7 @@ public function createCuota($cuotaId)
 
         return view('pagos.opciones_pago', [
             'entidad' => $cuota,
-            'qrBase64'=> $qrBase64
+            'qrBase64' => $qrBase64
         ]);
     }
 
@@ -126,7 +126,7 @@ public function createCuota($cuotaId)
         $esResidente = $user->residente_id && $user->residente_id === $multa->residente_id;
         $esEmpleado  = $user->empleado_id  && $user->empleado_id  === $multa->empleado_id;
 
-        if (! ($esResidente || $esEmpleado) ) {
+        if (! ($esResidente || $esEmpleado)) {
             abort(403);
         }
 
@@ -136,7 +136,7 @@ public function createCuota($cuotaId)
 
         return view('pagos.opciones_pago', [
             'entidad' => $multa,
-            'qrBase64'=> $qrBase64
+            'qrBase64' => $qrBase64
         ]);
     }
 
@@ -212,6 +212,8 @@ public function createCuota($cuotaId)
 
         return redirect()->route('pagos.mis_cuotas')->with('success', 'Pago realizado exitosamente con Stripe.');
     }
+
+    
     public function comprobante(Pago $pago)
     {
         // Validación de seguridad

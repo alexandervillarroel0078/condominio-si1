@@ -79,21 +79,25 @@ Route::get('/cuotasypagos', [CuotaController::class, 'index'])->name('cuotas.ind
 
 // Pago de una cuota
 Route::get('/pagos/create/cuota/{cuota}', [PagoController::class, 'createCuota'])
-     ->name('pagos.create.cuota')
-     ->middleware('auth');
+    ->name('pagos.create.cuota')
+    ->middleware('auth');
 
 // Pago de una multa
 Route::get('/pagos/create/multa/{multa}', [PagoController::class, 'createMulta'])
-     ->name('pagos.create.multa')
-     ->middleware('auth');
+    ->name('pagos.create.multa')
+    ->middleware('auth');
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('pagos', PagoController::class)->only(['index',  'store']);
 });
 
+
+Route::get('/pagos/comprobante/{pago}', [PagoController::class, 'comprobante'])->name('pagos.comprobante'); // ✅ CORRECTO
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/mis-cuotas', [PagoController::class, 'misCuotas'])->name('pagos.mis_cuotas');
     Route::post('/pagos/qr', [PagoController::class, 'pagoQR'])->name('pagos.qr');
+ 
     Route::post('/pagos/stripe', [PagoController::class, 'pagoStripe'])->name('pagos.stripe');
 });
 
@@ -187,4 +191,3 @@ Route::resource('notificaciones', NotificacionController::class)->parameters([
 
 
 Route::get('/mi-perfil', [UsuarioController::class, 'miPerfil'])->name('users.perfil');
-

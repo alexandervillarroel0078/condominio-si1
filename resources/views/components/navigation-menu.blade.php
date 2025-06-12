@@ -9,7 +9,7 @@
                     Inicio
                 </a>
                 <!-- -->
-                <div class="sb-sidenav-menu-heading">Módulos2</div>
+                <div class="sb-sidenav-menu-heading">Módulos</div>
 
 
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
@@ -134,15 +134,14 @@
                         </a>
                         <div class="collapse {{ request()->routeIs('tipo-gastos.*') || request()->routeIs('gastos.*') ? 'show' : '' }}"
                             id="collapseGastos">
-
                             <nav class="sb-sidenav-menu-nested nav">
                                 <a class="nav-link {{ request()->routeIs('gastos.index') ? 'active' : '' }}" href="{{ route('gastos.index') }}">Lista de Gastos</a>
                                 <a class="nav-link {{ request()->routeIs('tipo-gastos.index') ? 'active' : '' }}" href="{{ route('tipo-gastos.index') }}">Tipos de Gastos</a>
                             </nav>
                         </div>
 
-                        {{-- Gestión de Áreas Comunes --}}
-                        <a class="nav-link {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? '' : 'collapsed' }}"
+                            {{-- Gestión de Áreas Comunes --}}
+                        <a  class="nav-link {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? '' : 'collapsed' }}"
                             href="#" data-bs-toggle="collapse" data-bs-target="#collapseAreas"
                             aria-expanded="{{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'true' : 'false' }}"
                             aria-controls="collapseAreas">
@@ -150,23 +149,23 @@
                             Gestión de Áreas Comunes
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
-
-                        <div class="collapse {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'show' : '' }}"
+                        <div  class="collapse {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'show' : '' }}"
                             id="collapseAreas" data-bs-parent="#collapseFinanzas">
                             <nav class="sb-sidenav-menu-nested nav">
                                 {{-- Catálogo de Áreas --}}
-                                <a class="nav-link {{ request()->routeIs('areas-comunes.index') ? 'active' : '' }}"
+                                <a  class="nav-link {{ request()->routeIs('areas-comunes.index') ? 'active' : '' }}"
                                     href="{{ route('areas-comunes.index') }}">Catálogo
                                 </a>
                                 {{-- Reservas --}}
-                                <a class="nav-link {{ request()->routeIs('reservas.index') ? 'active' : '' }}"
+                                <a  class="nav-link {{ request()->routeIs('reservas.index') ? 'active' : '' }}"
                                     href="{{ route('reservas.index') }}">Reservas
                                 </a>
                             </nav>
                         </div>
-
-                        {{-- Otras secciones visibles sin permisos aún --}}
-                        <a class="nav-link" href="#">Multas y sanciones</a>
+                        {{-- Multas --}}
+                        <a class="nav-link" href="{{route('multas.index')}}"><div class="sb-nav-link-icon"><i class="fas fa-gavel"></i></div>
+                            Panel de Multas
+                        </a>
                     </nav>
                 </div>
 

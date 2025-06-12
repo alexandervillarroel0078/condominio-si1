@@ -36,6 +36,7 @@ class DatabaseSeeder extends Seeder
             MantenimientoSeeder::class,
             AreaComunSeeder::class,
             ReservaSeeder::class,
+            MultaSeeder::class,
         ]);
     }
 }

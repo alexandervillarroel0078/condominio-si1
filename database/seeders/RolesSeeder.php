@@ -16,6 +16,7 @@ class RolesSeeder extends Seeder
         // Rol Residente
         $residente = Role::firstOrCreate(['name' => 'Residente']);
         $residente->syncPermissions([
+            'gestionar visitas',
             'ver comunicados',
             'ver notificaciones',
             'ver agenda',
@@ -28,7 +29,7 @@ class RolesSeeder extends Seeder
         $portero = Role::firstOrCreate(['name' => 'Portero']);
         $portero->syncPermissions([
             'ver control de acceso',
-            'ver visitas',
+            'operar porteria',
             'ver invitaciones',
             'ver vigilancia',
         ]);
@@ -36,6 +37,7 @@ class RolesSeeder extends Seeder
         // Rol Directiva
         $directiva = Role::firstOrCreate(['name' => 'Miembro de Directiva']);
         $directiva->syncPermissions([
+            'administrar visitas',
             'ver usuarios',
             'ver roles',
             'ver empleados',

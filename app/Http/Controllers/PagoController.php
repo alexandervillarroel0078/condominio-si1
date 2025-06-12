@@ -24,7 +24,7 @@ class PagoController extends Controller
     {
         $query = \App\Models\Pago::with(['cuota.residente', 'user']);
 
-        // 🔥 Se eliminó el filtro por usuario autenticado
+        // Se eliminó el filtro por usuario autenticado
 
         if ($request->filled('search')) {
             $search = $request->search;
@@ -77,8 +77,6 @@ class PagoController extends Controller
         return $query->orderByDesc('fecha_pago')->paginate(10);
     }
 
-
-
     public function misCuotas()
     {
         $residente = auth()->user()->residente;
@@ -111,7 +109,6 @@ class PagoController extends Controller
 
         return view('pagos.opciones_pago', compact('cuota', 'qrBase64'));
     }
-
 
     public function pagoQR(Request $request)
     {
@@ -184,15 +181,15 @@ class PagoController extends Controller
 
         return redirect()->route('pagos.mis_cuotas')->with('success', 'Pago realizado exitosamente con Stripe.');
     }
-public function comprobante(Pago $pago)
-{
-    // Validación de seguridad
-    if (auth()->id() !== $pago->user_id && !auth()->user()->hasRole('admin')) {
-        abort(403);
-    }
+    public function comprobante(Pago $pago)
+    {
+        // Validación de seguridad
+        if (auth()->id() !== $pago->user_id && !auth()->user()->hasRole('admin')) {
+            abort(403);
+        }
 
-    return view('pagos.comprobante_html', compact('pago'));
-}
+        return view('pagos.comprobante_html', compact('pago'));
+    }
 
     public function store(Request $request)
     {

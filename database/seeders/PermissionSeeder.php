@@ -74,7 +74,9 @@ class PermissionSeeder extends Seeder
 
             // Seguridad y Accesos
             'ver control de acceso',
-            'ver visitas',
+            'gestionar visitas',        // Residente (sus visitas: CRUD)
+            'administrar visitas',      // Admin (todas las visitas + reportes)
+            'operar porteria',          // Portero (validar + entrada/salida + panel)
             'ver invitaciones',
             'ver vigilancia',
 

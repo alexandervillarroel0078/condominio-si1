@@ -4,7 +4,11 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
+<<<<<<< HEAD
     "content-hash": "0c6e17f0f1fccf945f03a62da063e106",
+=======
+    "content-hash": "ee8d07d2dfcfe5ccc5a321e69379d3f2",
+>>>>>>> origin/gersoft
     "packages": [
         {
             "name": "almasaeed2010/adminlte",
@@ -3986,16 +3990,16 @@
         },
         {
             "name": "spatie/laravel-permission",
-            "version": "6.18.0",
+            "version": "6.19.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spatie/laravel-permission.git",
-                "reference": "3c05f04d12275dfbe462c8b4aae3290e586c2dde"
+                "reference": "0cd412dcad066d75caf0b977716809be7e7642fd"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/3c05f04d12275dfbe462c8b4aae3290e586c2dde",
-                "reference": "3c05f04d12275dfbe462c8b4aae3290e586c2dde",
+                "url": "https://api.github.com/repos/spatie/laravel-permission/zipball/0cd412dcad066d75caf0b977716809be7e7642fd",
+                "reference": "0cd412dcad066d75caf0b977716809be7e7642fd",
                 "shasum": ""
             },
             "require": {
@@ -4057,7 +4061,7 @@
             ],
             "support": {
                 "issues": "https://github.com/spatie/laravel-permission/issues",
-                "source": "https://github.com/spatie/laravel-permission/tree/6.18.0"
+                "source": "https://github.com/spatie/laravel-permission/tree/6.19.0"
             },
             "funding": [
                 {
@@ -4065,7 +4069,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-05-14T03:32:23+00:00"
+            "time": "2025-05-31T00:50:27+00:00"
         },
         {
             "name": "stripe/stripe-php",
@@ -11021,12 +11025,12 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": {},
+    "stability-flags": [],
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.2"
     },
-    "platform-dev": {},
+    "platform-dev": [],
     "plugin-api-version": "2.6.0"
 }

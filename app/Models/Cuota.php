@@ -36,15 +36,15 @@ class Cuota extends Model
     {
         return $this->belongsTo(TipoCuota::class);
     }
+
     // Devuelve true si la cuota tiene al menos un pago
     public function estaPagada()
     {
         return $this->pagos()->exists();
     }
 
-    // Devuelve el último pago registrado
-    public function ultimoPago()
+    public function multas()
     {
-        return $this->pagos()->latest('fecha_pago')->first();
+        return $this->hasMany(Multa::class);
     }
 }

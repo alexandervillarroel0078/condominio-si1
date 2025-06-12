@@ -179,7 +179,8 @@
                                 class="list-group-item list-group-item-action">Residentes</a>
                             <a href="{{ route('unidades.index') }}" class="list-group-item list-group-item-action">Unidades</a>
                             <a href="#" class="list-group-item list-group-item-action">Empresas Externas</a>
-                            <a href="#" class="list-group-item list-group-item-action">Mantenimiento</a>
+                            <a href="{{ route('mantenimientos.index') }}"
+                                class="list-group-item list-group-item-action">Mantenimiento</a>
                         </ul>
                     </div>
                 </div>
@@ -202,9 +203,12 @@
                                 href="{{ route('tipo-gastos.index') }}">Tipos Gastos del Condominio</a>
                             <a href="{{ route('gastos.index') }}"
                                 class="list-group-item list-group-item-action">Gastos del Condominio</a>
-                            <a href="#" class="list-group-item list-group-item-action">Reservas de Áreas
-                                Comunes</a>
-                            <a href="#" class="list-group-item list-group-item-action">Multas y Sanciones</a>
+                            <a href="{{ route('areas-comunes.index') }}"
+                                class="list-group-item list-group-item-action">Catalogo de Areas Comunes</a>
+                            <a href="{{ route('reservas.index') }}"
+                                class="list-group-item list-group-item-action">Reservas de Áreas Comunes</a>
+                            <a href="{{ route('multas.index') }}"
+                                class="list-group-item list-group-item-action">Panel de Multas</a>
                         </ul>
                     </div>
                 </div>
@@ -228,7 +232,8 @@
                                 Noticias</a>
                             <a href="#" class="list-group-item list-group-item-action">Reclamos y
                                 Sugerencias</a>
-                            <a href="#" class="list-group-item list-group-item-action">Notificaciones</a>
+                            <a href="{{ route('notificaciones.index') }}" 
+                                class="list-group-item list-group-item-action">Notificaciones</a>
                         </ul>
                     </div>
                 </div>

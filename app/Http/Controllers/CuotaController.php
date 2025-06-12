@@ -6,11 +6,14 @@ use App\Models\Cuota;
 use Illuminate\Http\Request;
 use App\Models\Residente;
 use Spatie\Permission\Models\Role;
+use App\Traits\BitacoraTrait;
 
 use Carbon\Carbon;
 
 class CuotaController extends Controller
 {
+    use BitacoraTrait;
+
     public function index(Request $request)
     {
         $query = Cuota::with('residente');
@@ -72,6 +75,8 @@ class CuotaController extends Controller
         $residentes = \App\Models\Residente::all();
         $roles = Role::pluck('name'); // 🔁 trae solo los nombres de roles
 
+        $this->registrarEnBitacora('Ingresó al formulario de crear cuota', auth()->id());
+        
         return view('cuotas.create', compact('tiposCuotas', 'residentes', 'roles'));
     }
 
@@ -119,33 +124,35 @@ class CuotaController extends Controller
         return redirect()->route('cuotas.index')->with('success', 'Cuota(s) registrada(s) correctamente.');
     }
 
-
-
-
-
     public function edit(Cuota $cuota)
     {
         return view('cuotas.edit', compact('cuota'));
     }
 
     public function update(Request $request, Cuota $cuota)
-{
-    $request->validate([
-        'titulo' => 'required|string|max:255',
-        'descripcion' => 'required|string',
-        'fecha_emision' => 'required|date',
-        'fecha_vencimiento' => 'required|date|after_or_equal:fecha_emision',
-        'monto' => 'required|numeric',
-        'estado' => 'required|in:pendiente,activa,cancelada,pagado',
-        'observacion' => 'nullable|string',
-    ]);
+    {
+        $request->validate([
+            'titulo' => 'required|string|max:255',
+            'descripcion' => 'required|string',
+            'fecha_emision' => 'required|date',
+            'fecha_vencimiento' => 'required|date|after_or_equal:fecha_emision',
+            'monto' => 'required|numeric',
+            'estado' => 'required|in:pendiente,activa,cancelada,pagado',
+            'observacion' => 'nullable|string',
+        ]);
 
-    $cuota->update($request->only([
-        'titulo', 'descripcion', 'fecha_emision', 'fecha_vencimiento', 'monto', 'estado', 'observacion'
-    ]));
+        $cuota->update($request->only([
+            'titulo',
+            'descripcion',
+            'fecha_emision',
+            'fecha_vencimiento',
+            'monto',
+            'estado',
+            'observacion'
+        ]));
 
-    return redirect()->route('cuotas.index')->with('success', 'Cuota actualizada correctamente.');
-}
+        return redirect()->route('cuotas.index')->with('success', 'Cuota actualizada correctamente.');
+    }
 
 
     public function destroy(Cuota $cuota)
@@ -153,11 +160,10 @@ class CuotaController extends Controller
         $cuota->delete();
         return redirect()->route('cuotas.index')->with('success', 'Cuota eliminada correctamente.');
     }
-public function show(Cuota $cuota)
-{
-    return view('cuotas.show', compact('cuota'));
-}
 
 
-
+    public function show(Cuota $cuota)
+    {
+        return view('cuotas.show', compact('cuota'));
+    }
 }

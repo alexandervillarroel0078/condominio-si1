@@ -34,16 +34,25 @@ Route::middleware(['auth'])->group(function () {
 });
 Route::get('/api/horas-libres', [ReservaController::class, 'horasLibres']);
 
-// GESTIÓN DE VISITAS
+// GESTIÓN DE VISITAS 
 Route::middleware(['auth'])->group(function () {
     Route::resource('visitas', VisitaController::class);
     
-    // Rutas específicas para guardias
-    Route::post('/visitas/validar-codigo', [VisitaController::class, 'validarCodigo'])->name('visitas.validar-codigo');
-    Route::post('/visitas/{visita}/entrada', [VisitaController::class, 'registrarEntrada'])->name('visitas.entrada');
-    Route::post('/visitas/{visita}/salida', [VisitaController::class, 'registrarSalida'])->name('visitas.salida');
-    Route::get('/panel-guardia', [VisitaController::class, 'panelGuardia'])->name('visitas.panel-guardia');
-    Route::get('/buscar-codigo', [VisitaController::class, 'buscarPorCodigo'])->name('visitas.buscar-codigo');
+    // Ruta para mostrar formulario de validación
+    Route::get('/validar-codigo', [VisitaController::class, 'mostrarValidarCodigo'])
+        ->name('visitas.mostrar-validar-codigo');
+    
+    // Rutas específicas para guardias (control en controlador)
+    Route::post('/visitas/validar-codigo', [VisitaController::class, 'validarCodigo'])
+        ->name('visitas.validar-codigo');
+    Route::post('/visitas/{visita}/entrada', [VisitaController::class, 'registrarEntrada'])
+        ->name('visitas.entrada');
+    Route::post('/visitas/{visita}/salida', [VisitaController::class, 'registrarSalida'])
+        ->name('visitas.salida');
+    Route::get('/panel-guardia', [VisitaController::class, 'panelGuardia'])
+        ->name('visitas.panel-guardia');
+    Route::get('/buscar-codigo', [VisitaController::class, 'buscarPorCodigo'])
+        ->name('visitas.buscar-codigo');
 });
 
 // GESTIÓN DE GASTOS

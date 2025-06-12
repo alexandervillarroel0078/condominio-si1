@@ -25,6 +25,7 @@ use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\UnidadController;
 use App\Http\Controllers\MultaController;
 use App\Http\Controllers\VisitaController;
+use App\Http\Controllers\NotificacionController;
 //gestion de multas
 Route::middleware(['auth'])->group(function () {
     Route::resource('multas', MultaController::class)->parameters([
@@ -149,3 +150,8 @@ Route::get('/prueba-permiso', function () {
 })->middleware(['auth', 'permission:ver-role']);
 
 Route::resource('unidades', UnidadController::class);
+
+Route::resource('notificaciones', NotificacionController::class)->parameters([
+    'notificaciones' => 'notificacion',
+]);
+

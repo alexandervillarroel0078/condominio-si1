@@ -23,6 +23,7 @@ use App\Http\Controllers\GastoController;
 use App\Http\Controllers\AreaComunController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\UnidadController;
+use App\Http\Controllers\NotificacionController;
 
 
 //gestion de areas comunes
@@ -102,3 +103,8 @@ Route::get('/prueba-permiso', function () {
 
 // Rutas para la gestión de unidades
 Route::resource('unidades', UnidadController::class);
+
+Route::resource('notificaciones', NotificacionController::class)->parameters([
+    'notificaciones' => 'notificacion',
+]);
+

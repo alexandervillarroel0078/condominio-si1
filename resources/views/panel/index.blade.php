@@ -179,7 +179,8 @@
                                 class="list-group-item list-group-item-action">Residentes</a>
                             <a href="{{ route('unidades.index') }}" class="list-group-item list-group-item-action">Unidades</a>
                             <a href="#" class="list-group-item list-group-item-action">Empresas Externas</a>
-                            <a href="#" class="list-group-item list-group-item-action">Mantenimiento</a>
+                            <a href="{{ route('mantenimientos.index') }}"
+                                class="list-group-item list-group-item-action">Mantenimiento</a>
                         </ul>
                     </div>
                 </div>
@@ -228,7 +229,8 @@
                                 Noticias</a>
                             <a href="#" class="list-group-item list-group-item-action">Reclamos y
                                 Sugerencias</a>
-                            <a href="#" class="list-group-item list-group-item-action">Notificaciones</a>
+                            <a href="{{ route('notificaciones.index') }}" 
+                                class="list-group-item list-group-item-action">Notificaciones</a>
                         </ul>
                     </div>
                 </div>

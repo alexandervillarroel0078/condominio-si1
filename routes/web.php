@@ -97,7 +97,6 @@ Route::get('/pagos/comprobante/{pago}', [PagoController::class, 'comprobante'])-
 Route::middleware(['auth'])->group(function () {
     Route::get('/mis-cuotas', [PagoController::class, 'misCuotas'])->name('pagos.mis_cuotas');
     Route::post('/pagos/qr', [PagoController::class, 'pagoQR'])->name('pagos.qr');
- 
     Route::post('/pagos/stripe', [PagoController::class, 'pagoStripe'])->name('pagos.stripe');
 });
 

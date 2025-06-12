@@ -114,31 +114,8 @@ class PagoController extends Controller
         ]);
     }
 
-    /**
-     * Mostrar opciones de pago para una multa
-     */
-    public function createMulta($multaId)
-    {
-        $multa = Multa::with('pagos')->findOrFail($multaId);
 
-        // Solo el residente o empleado al que corresponde puede pagar
-        $user = auth()->user();
-        $esResidente = $user->residente_id && $user->residente_id === $multa->residente_id;
-        $esEmpleado  = $user->empleado_id  && $user->empleado_id  === $multa->empleado_id;
 
-        if (! ($esResidente || $esEmpleado)) {
-            abort(403);
-        }
-
-        // Generar contenido QR
-        $contenidoQr = urlencode("Pago de multa\nMotivo: {$multa->motivo}\nMonto: Bs {$multa->monto}");
-        $qrBase64    = "https://api.qrserver.com/v1/create-qr-code/?data={$contenidoQr}&size=200x200";
-
-        return view('pagos.opciones_pago', [
-            'entidad' => $multa,
-            'qrBase64' => $qrBase64
-        ]);
-    }
 
 
     public function pagoQR(Request $request)
@@ -213,6 +190,28 @@ class PagoController extends Controller
         return redirect()->route('pagos.mis_cuotas')->with('success', 'Pago realizado exitosamente con Stripe.');
     }
 
+    public function createMulta($multaId)
+    {
+        $multa = Multa::with('pagos')->findOrFail($multaId);
+
+        // Solo el residente o empleado al que corresponde puede pagar
+        $user = auth()->user();
+        $esResidente = $user->residente_id && $user->residente_id === $multa->residente_id;
+        $esEmpleado  = $user->empleado_id  && $user->empleado_id  === $multa->empleado_id;
+
+        if (! ($esResidente || $esEmpleado)) {
+            abort(403);
+        }
+
+        // Generar contenido QR
+        $contenidoQr = urlencode("Pago de multa\nMotivo: {$multa->motivo}\nMonto: Bs {$multa->monto}");
+        $qrBase64    = "https://api.qrserver.com/v1/create-qr-code/?data={$contenidoQr}&size=200x200";
+
+        return view('pagos.opciones_pago', [
+            'entidad' => $multa,
+            'qrBase64' => $qrBase64
+        ]);
+    }
     
     public function comprobante(Pago $pago)
     {

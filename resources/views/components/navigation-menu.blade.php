@@ -215,21 +215,35 @@
                 </div>
 
 
-                {{-- Seguridad y Accesos --}}
-                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
-                    data-bs-target="#collapseSeguridad" aria-expanded="false" aria-controls="collapseSeguridad">
-                    <div class="sb-nav-link-icon"><i class="fas fa-shield-alt"></i></div>
-                    Seguridad y Accesos
-                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                </a>
-                <div class="collapse" id="collapseSeguridad" data-bs-parent="#sidenavAccordion">
-                    <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="#">Control de Acceso</a>
-                        <a class="nav-link" href="{{ route('visitas.index') }}">Visitas</a>
-                        <a class="nav-link" href="{{ route('visitas.panel-guardia') }}">Panel Guardia</a>
-                        <a class="nav-link" href="#">Seguridad y Vigilancia</a>
-                    </nav>
-                </div>
+            {{-- Seguridad y Accesos --}}
+            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                data-bs-target="#collapseSeguridad" aria-expanded="false" aria-controls="collapseSeguridad">
+                <div class="sb-nav-link-icon"><i class="fas fa-shield-alt"></i></div>
+                Seguridad y Accesos
+                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+            </a>
+            <div class="collapse" id="collapseSeguridad" data-bs-parent="#sidenavAccordion">
+                <nav class="sb-sidenav-menu-nested nav">
+                    <a class="nav-link" href="#">Control de Acceso</a>
+                    
+                    {{--Solo para usuarios con permiso 'gestionar visitas' --}}
+                    @can('gestionar visitas')
+                    <a class="nav-link" href="{{ route('visitas.index') }}">Visitas</a>
+                    @endcan
+                    
+                    {{--Solo para usuarios con permiso 'operar porteria' --}}
+                    @can('operar porteria')
+                    <a class="nav-link" href="{{ route('visitas.panel-guardia') }}">Panel Guardia</a>
+                    @endcan
+                    
+                    {{-- Solo para usuarios con permiso 'administrar visitas' --}}
+                    @can('administrar visitas')
+                        <a class="nav-link" href="{{ route('visitas.mostrar-validar-codigo') }}">Validar Código Visita</a>
+                    @endcan
+                    
+                    <a class="nav-link" href="#">Seguridad y Vigilancia</a>
+                </nav>
+            </div>
 
 
                 {{-- Comunidad y Reportes --}}

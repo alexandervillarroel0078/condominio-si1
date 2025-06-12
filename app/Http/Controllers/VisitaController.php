@@ -1,6 +1,5 @@
 <?php
 
-
 namespace App\Http\Controllers;
 
 use App\Models\Visita;
@@ -9,36 +8,88 @@ use App\Models\Bitacora;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
 class VisitaController extends Controller
 {
     protected $rol;
+    protected $permisos;
 
     public function __construct()
     {
         $this->middleware(function ($request, $next) {
-            $this->rol = Auth::user()->roles->pluck('name')->join(', ');
+            $user = Auth::user();
+            $this->rol = $user->roles->pluck('name')->join(', ');
+            
+            //  OBTENER PERMISOS DESDE LA BASE DE DATOS
+            $this->permisos = $this->obtenerPermisosUsuario($user);
+            
             return $next($request);
         });
     }
 
-    // Lista de visitas (para administrador/guardia)
+    //  MÉTODO PARA OBTENER PERMISOS DESDE LA BD
+    private function obtenerPermisosUsuario($user)
+    {
+        // Obtener permisos del usuario a través de sus roles
+        $permisos = DB::table('role_has_permissions')
+            ->join('permissions', 'role_has_permissions.permission_id', '=', 'permissions.id')
+            ->join('model_has_roles', 'role_has_permissions.role_id', '=', 'model_has_roles.role_id')
+            ->where('model_has_roles.model_id', $user->id)
+            ->where('model_has_roles.model_type', get_class($user))
+            ->pluck('permissions.name')
+            ->toArray();
+
+        // También obtener permisos directos del usuario (si los hay)
+        $permisosDirectos = DB::table('model_has_permissions')
+            ->join('permissions', 'model_has_permissions.permission_id', '=', 'permissions.id')
+            ->where('model_has_permissions.model_id', $user->id)
+            ->where('model_has_permissions.model_type', get_class($user))
+            ->pluck('permissions.name')
+            ->toArray();
+
+        return array_unique(array_merge($permisos, $permisosDirectos));
+    }
+
+    //  VERIFICAR PERMISOS DINÁMICAMENTE
+    private function tienePermiso($permiso)
+    {
+        return in_array($permiso, $this->permisos);
+    }
+
+    //  VERIFICAR MÚLTIPLES PERMISOS (OR)
+    private function tieneAlgunPermiso($permisos)
+    {
+        return !empty(array_intersect($permisos, $this->permisos));
+    }
+
+    //  LISTA DE VISITAS CON LOS 3 PERMISOS ESPECÍFICOS
     public function index(Request $request)
     {
         $user = Auth::user();
-        $rol = $this->rol;
 
-        // Filtrar visitas según el rol del usuario
-        if ($rol == 'Residente') {
-            // Residente solo ve sus propias visitas
+        //  VERIFICAR LOS 3 PERMISOS ESPECÍFICOS DE VISITAS
+        if ($this->tienePermiso('administrar visitas')) {
+            //  ADMIN: Ve TODAS las visitas de TODOS los residentes
+            $titulo = "Administrar Visitas";
+            $query = Visita::with(['residente', 'userEntrada', 'userSalida']);
+            
+        } elseif ($this->tienePermiso('operar porteria')) {
+            //  PORTERO: Ve todas las visitas para control de acceso
+            $titulo = "Control de Acceso - Portería";
+            $query = Visita::with(['residente', 'userEntrada', 'userSalida']);
+            
+        } elseif ($this->tienePermiso('gestionar visitas')) {
+            //  RESIDENTE: Solo SUS propias visitas (CRUD de su mismo ID)
+            $titulo = "Mis Visitas";
             $query = Visita::with(['residente', 'userEntrada', 'userSalida'])
                         ->whereHas('residente', function($q) use ($user) {
                             $q->where('email', $user->email);
                         });
         } else {
-            // Admin/Guardia ven todas las visitas
-            $query = Visita::with(['residente', 'userEntrada', 'userSalida']);
+            //  Sin permisos de visitas
+            abort(403, 'No tienes permisos para ver visitas');
         }
 
         // Aplicar filtros de búsqueda
@@ -59,33 +110,33 @@ class VisitaController extends Controller
 
         $visitas = $query->orderBy('created_at', 'desc')->paginate(15);
         
-        return view('visitas.index', compact('visitas'));
+        return view('visitas.index', compact('visitas', 'titulo'));
     }
 
-    // Formulario para crear visita (residente)
+    // CREAR VISITAS CON LOS 3 PERMISOS ESPECÍFICOS
     public function create()
     {
         $user = Auth::user();
-        $rol = $this->rol;
         
-        
-        if ($rol == 'Residente') {
-            // Residente solo puede crear visitas para sí mismo
+        if ($this->tienePermiso('administrar visitas')) {
+            // 🔧 ADMIN: Puede crear visitas para CUALQUIER residente
+            $residentes = Residente::all();
+            
+        } elseif ($this->tienePermiso('gestionar visitas')) {
+            // RESIDENTE: Solo puede crear visitas para SÍ MISMO
             $residentes = Residente::where('email', $user->email)->get();
             if ($residentes->count() == 0) {  
-                // Mostrar todos los emails para comparar
-                $todosLosEmails = Residente::pluck('email')->toArray();
-            } else {
-                $residente = $residentes->first();
+                return redirect()->back()->with('error', 'Tu email no está registrado como residente.');
             }
         } else {
-            // Admin puede crear para cualquier residente
-            $residentes = Residente::all();
-        }     
+            // PORTERO y otros no pueden crear visitas
+            abort(403, 'No tienes permisos para crear visitas');
+        }
+        
         return view('visitas.create', compact('residentes'));
     }
 
-    // Guardar nueva visita (residente)
+    // GUARDAR VISITAS CON LOS 3 PERMISOS ESPECÍFICOS
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -95,14 +146,14 @@ class VisitaController extends Controller
             'nombre_visitante' => 'required|string|max:255',
             'ci_visitante' => 'required|string|max:20',
             'motivo' => 'required|string|max:255',
-            'fecha_inicio' => 'required|date',
+            'fecha_inicio' => 'required|date|after_or_equal:now',
             'fecha_fin' => 'required|date|after:fecha_inicio',
             'placa_vehiculo' => 'nullable|string|max:20'
         ]);
 
-        // Verificar que el residente solo pueda crear visitas para sí mismo
-        $rol = $this->rol;
-        if ($rol == 'Residente') {
+        // VERIFICAR RESTRICCIONES SEGÚN PERMISOS
+        if ($this->tienePermiso('gestionar visitas') && !$this->tienePermiso('administrar visitas')) {
+            //  RESIDENTE: Solo puede crear visitas para SÍ MISMO
             $residente = Residente::find($request->residente_id);
             if ($residente->email !== $user->email) {
                 return redirect()->back()
@@ -123,7 +174,6 @@ class VisitaController extends Controller
             'estado' => 'pendiente'
         ]);
 
-        // Registrar en bitácora
         $this->registrarBitacora(
             'CREAR_VISITA',
             "Visita creada para {$visita->nombre_visitante} (CI: {$visita->ci_visitante}) - Código: {$visita->codigo}",
@@ -131,28 +181,34 @@ class VisitaController extends Controller
         );
 
         return redirect()->route('visitas.show', $visita)
-            ->with('success', 'Visita registrada. Código: ' . $visita->codigo);
+            ->with('success', 'Visita registrada correctamente. Código: ' . $visita->codigo);
     }
 
-    // Ver detalles de visita
+    // VER DETALLES CON LOS 3 PERMISOS ESPECÍFICOS
     public function show($id)
     {
         $user = Auth::user();
         $visita = Visita::findOrFail($id);
         
-        // Control de acceso: residente solo sus visitas
-        $rol = $this->rol;
-        if ($rol == 'Residente') {
+        //  CONTROL DE ACCESO SEGÚN LOS 3 PERMISOS
+        if ($this->tienePermiso('administrar visitas') || $this->tienePermiso('operar porteria')) {
+            // 🔧 ADMIN o 🚪 PORTERO: Pueden ver CUALQUIER visita
+            // Sin restricciones
+        } elseif ($this->tienePermiso('gestionar visitas')) {
+            // 🏠 RESIDENTE: Solo SUS propias visitas
             if ($visita->residente->email !== $user->email) {
                 abort(403, 'Esta visita no te pertenece');
             }
+        } else {
+            //  Sin permisos
+            abort(403, 'No tienes permisos para ver esta visita');
         }
         
         $visita->load(['residente', 'userEntrada', 'userSalida']);
         return view('visitas.show', compact('visita'));
     }
 
-    // Formulario para editar visita
+    //  EDITAR VISITAS CON LOS 3 PERMISOS ESPECÍFICOS
     public function edit($id)
     {
         $user = Auth::user();
@@ -164,22 +220,25 @@ class VisitaController extends Controller
                 ->with('error', 'Solo se pueden editar visitas pendientes');
         }
 
-        // Control de acceso: residente solo sus visitas
-        $rol = $this->rol;
-        if ($rol == 'Residente') {
+        // CONTROL DE ACCESO SEGÚN LOS 3 PERMISOS
+        if ($this->tienePermiso('administrar visitas')) {
+            // ADMIN: Puede editar CUALQUIER visita
+            $residentes = Residente::all();
+        } elseif ($this->tienePermiso('gestionar visitas')) {
+            //  RESIDENTE: Solo SUS propias visitas
             if ($visita->residente->email !== $user->email) {
                 abort(403, 'Esta visita no te pertenece');
             }
             $residentes = Residente::where('email', $user->email)->get();
         } else {
-            // Admin puede editar cualquier visita
-            $residentes = Residente::all();
+            //  PORTERO y otros no pueden editar
+            abort(403, 'No tienes permisos para editar visitas');
         }
         
         return view('visitas.edit', compact('visita', 'residentes'));
     }
 
-    // Actualizar visita
+    // ACTUALIZAR VISITAS CON LOS 3 PERMISOS ESPECÍFICOS
     public function update(Request $request, $id)
     {
         $user = Auth::user();
@@ -191,9 +250,9 @@ class VisitaController extends Controller
                 ->with('error', 'Solo se pueden editar visitas pendientes');
         }
 
-        // Control de acceso: residente solo sus visitas
-        $rol = $this->rol;
-        if ($rol == 'Residente') {
+        //  CONTROL DE ACCESO SEGÚN LOS 3 PERMISOS
+        if ($this->tienePermiso('gestionar visitas') && !$this->tienePermiso('administrar visitas')) {
+            // 🏠 RESIDENTE: Solo SUS propias visitas
             if ($visita->residente->email !== $user->email) {
                 abort(403, 'Esta visita no te pertenece');
             }
@@ -204,7 +263,7 @@ class VisitaController extends Controller
             'nombre_visitante' => 'required|string|max:255',
             'ci_visitante' => 'required|string|max:20',
             'motivo' => 'required|string|max:255',
-            'fecha_inicio' => 'required|date',
+            'fecha_inicio' => 'required|date|after_or_equal:now',
             'fecha_fin' => 'required|date|after:fecha_inicio',
             'placa_vehiculo' => 'nullable|string|max:20'
         ]);
@@ -219,7 +278,6 @@ class VisitaController extends Controller
             'fecha_fin' => $request->fecha_fin,
         ]);
 
-        // Registrar en bitácora
         $this->registrarBitacora(
             'EDITAR_VISITA',
             "Visita editada - Visitante: {$visita->nombre_visitante}, CI: {$visita->ci_visitante}",
@@ -230,7 +288,7 @@ class VisitaController extends Controller
             ->with('success', 'Visita actualizada correctamente');
     }
 
-    // Eliminar visita
+    // ELIMINAR VISITAS CON LOS 3 PERMISOS ESPECÍFICOS
     public function destroy($id)
     {
         $user = Auth::user();
@@ -242,19 +300,24 @@ class VisitaController extends Controller
                 ->with('error', 'No se puede eliminar una visita en curso o finalizada');
         }
 
-        // Control de acceso: residente solo sus visitas
-        $rol = $this->rol;
-        if ($rol == 'Residente') {
+        // CONTROL DE ACCESO SEGÚN LOS 3 PERMISOS
+        if ($this->tienePermiso('administrar visitas')) {
+            // ADMIN: Puede eliminar CUALQUIER visita
+            // Sin restricciones
+        } elseif ($this->tienePermiso('gestionar visitas')) {
+            // RESIDENTE: Solo SUS propias visitas
             if ($visita->residente->email !== $user->email) {
                 abort(403, 'Esta visita no te pertenece');
             }
+        } else {
+            //  PORTERO y otros no pueden eliminar
+            abort(403, 'No tienes permisos para eliminar visitas');
         }
 
         $nombreVisitante = $visita->nombre_visitante;
         $ciVisitante = $visita->ci_visitante;
         $codigo = $visita->codigo;
 
-        // Registrar eliminación en bitácora antes de eliminar
         $this->registrarBitacora(
             'ELIMINAR_VISITA',
             "Visita eliminada - Visitante: {$nombreVisitante}, CI: {$ciVisitante}, Código: {$codigo}",
@@ -267,28 +330,22 @@ class VisitaController extends Controller
             ->with('success', 'Visita eliminada correctamente');
     }
 
-    // Mostrar formulario de validación de código
+    // VALIDAR CÓDIGO - SOLO PORTERO Y ADMIN
     public function mostrarValidarCodigo()
     {
-        $user = Auth::user();
-        
-        // Solo guardia y admin pueden validar códigos
-        $rol = $this->rol;
-        if ($rol == 'Residente') {
+        // 🚪 Solo PORTERO y 🔧 ADMIN pueden validar códigos
+        if (!$this->tieneAlgunPermiso(['operar porteria', 'administrar visitas'])) {
             abort(403, 'No tienes permisos para validar códigos');
         }
         
         return view('visitas.validar-codigo');
     }
 
-    // Validar código y mostrar datos (guardia)
+    // VALIDAR CÓDIGO CON TOLERANCIA DE 30 MINUTOS
     public function validarCodigo(Request $request)
     {
-        $user = Auth::user();
-        
-        // Solo guardia y admin pueden validar códigos
-        $rol = $this->rol;
-        if ($rol == 'Residente') {
+        // 🚪 Solo PORTERO y 🔧 ADMIN pueden validar códigos
+        if (!$this->tieneAlgunPermiso(['operar porteria', 'administrar visitas'])) {
             return response()->json([
                 'success' => false,
                 'message' => 'No tienes permisos para validar códigos'
@@ -303,10 +360,10 @@ class VisitaController extends Controller
         $visita = Visita::where('codigo', $request->codigo)
             ->where('ci_visitante', $request->ci_visitante)
             ->where('estado', 'pendiente')
+            ->with('residente')
             ->first();
 
         if (!$visita) {
-            // Registrar intento fallido en bitácora
             $this->registrarBitacora(
                 'VALIDACION_FALLIDA',
                 "Intento de validación fallido - Código: {$request->codigo}, CI: {$request->ci_visitante}"
@@ -318,23 +375,34 @@ class VisitaController extends Controller
             ]);
         }
 
-        // Validar horario
+        // VALIDAR HORARIO CON TOLERANCIA DE 30 MINUTOS
         $ahora = Carbon::now();
-        if ($ahora < $visita->fecha_inicio || $ahora > $visita->fecha_fin) {
-            // Registrar intento fuera de horario
+        $inicioConTolerancia = Carbon::parse($visita->fecha_inicio)->subMinutes(30);
+        $finVisita = Carbon::parse($visita->fecha_fin);
+
+        if ($ahora < $inicioConTolerancia || $ahora > $finVisita) {
+            $mensaje = '';
+            
+            if ($ahora < $inicioConTolerancia) {
+                $minutosAntes = $ahora->diffInMinutes($inicioConTolerancia);
+                $mensaje = "Visita muy temprana. Debe esperar {$minutosAntes} minutos más";
+            } elseif ($ahora > $finVisita) {
+                $minutosTarde = $ahora->diffInMinutes($finVisita);
+                $mensaje = "Visita expirada. Se pasó {$minutosTarde} minutos del horario autorizado";
+            }
+
             $this->registrarBitacora(
-                'FUERA_HORARIO',
-                "Intento de ingreso fuera de horario - Visitante: {$visita->nombre_visitante}, Código: {$request->codigo}",
+                'INTENTO_FUERA_HORARIO',
+                "Intento de ingreso fuera de horario - Visitante: {$visita->nombre_visitante}, Detalle: {$mensaje}",
                 $visita->id
             );
 
             return response()->json([
                 'success' => false,
-                'message' => 'Fuera del horario autorizado'
+                'message' => $mensaje
             ]);
         }
 
-        // Registrar validación exitosa
         $this->registrarBitacora(
             'VALIDACION_EXITOSA',
             "Código validado correctamente - Visitante: {$visita->nombre_visitante}, CI: {$request->ci_visitante}",
@@ -349,25 +417,50 @@ class VisitaController extends Controller
                 'ci_visitante' => $visita->ci_visitante,
                 'motivo' => $visita->motivo,
                 'residente' => $visita->residente->nombre_completo,
-                'placa_vehiculo' => $visita->placa_vehiculo
+                'placa_vehiculo' => $visita->placa_vehiculo,
+                'fecha_inicio' => $visita->fecha_inicio,
+                'fecha_fin' => $visita->fecha_fin
             ]
         ]);
     }
 
-    // Registrar entrada (guardia)
+    // REGISTRAR ENTRADA - SOLO PORTERO Y ADMIN
     public function registrarEntrada(Request $request, $id)
     {
-        $user = Auth::user();
         $visita = Visita::findOrFail($id);
         
-        // Solo guardia y admin pueden registrar entradas
-        $rol = $this->rol;
-        if ($rol == 'Residente') {
+        // 🚪 Solo PORTERO y 🔧 ADMIN pueden registrar entradas
+        if (!$this->tieneAlgunPermiso(['operar porteria', 'administrar visitas'])) {
             return redirect()->back()->with('error', 'No tienes permisos para registrar entradas');
         }
         
         if ($visita->estado !== 'pendiente') {
             return redirect()->back()->with('error', 'Esta visita ya fue procesada');
+        }
+
+        // VALIDAR HORARIO ANTES DE REGISTRAR ENTRADA
+        $ahora = Carbon::now();
+        $inicioConTolerancia = Carbon::parse($visita->fecha_inicio)->subMinutes(30);
+        $finVisita = Carbon::parse($visita->fecha_fin);
+
+        if ($ahora < $inicioConTolerancia || $ahora > $finVisita) {
+            $mensaje = '';
+            
+            if ($ahora < $inicioConTolerancia) {
+                $minutosAntes = $ahora->diffInMinutes($inicioConTolerancia);
+                $mensaje = "Entrada muy temprana. Debe esperar {$minutosAntes} minutos más";
+            } elseif ($ahora > $finVisita) {
+                $minutosTarde = $ahora->diffInMinutes($finVisita);
+                $mensaje = "Entrada tardía. Se pasó {$minutosTarde} minutos del horario autorizado";
+            }
+
+            $this->registrarBitacora(
+                'ENTRADA_FUERA_HORARIO',
+                "Intento de entrada fuera de horario - Visitante: {$visita->nombre_visitante}, Detalle: {$mensaje}",
+                $visita->id
+            );
+
+            return redirect()->back()->with('error', $mensaje);
         }
 
         $visita->update([
@@ -376,7 +469,6 @@ class VisitaController extends Controller
             'user_entrada_id' => Auth::id()
         ]);
 
-        // Registrar entrada en bitácora
         $this->registrarBitacora(
             'REGISTRAR_ENTRADA',
             "Entrada registrada - Visitante: {$visita->nombre_visitante}, CI: {$visita->ci_visitante}",
@@ -387,15 +479,13 @@ class VisitaController extends Controller
             ->with('success', 'Entrada registrada correctamente');
     }
 
-    // Registrar salida (guardia)
+    // REGISTRAR SALIDA - SOLO PORTERO Y ADMIN
     public function registrarSalida(Request $request, $id)
     {
-        $user = Auth::user();
         $visita = Visita::findOrFail($id);
         
-        // Solo guardia y admin pueden registrar salidas
-        $rol = $this->rol;
-        if ($rol == 'Residente') {
+        // Solo PORTERO y ADMIN pueden registrar salidas
+        if (!$this->tieneAlgunPermiso(['operar porteria', 'administrar visitas'])) {
             return redirect()->back()->with('error', 'No tienes permisos para registrar salidas');
         }
         
@@ -403,57 +493,74 @@ class VisitaController extends Controller
             return redirect()->back()->with('error', 'No se puede registrar salida');
         }
 
+        // VERIFICAR SI LA SALIDA ES DESPUÉS DEL HORARIO AUTORIZADO
+        $ahora = Carbon::now();
+        $finVisita = Carbon::parse($visita->fecha_fin);
+        $observacionesExtra = '';
+
+        if ($ahora > $finVisita) {
+            $minutosTarde = $ahora->diffInMinutes($finVisita);
+            $observacionesExtra = "SALIDA TARDÍA: {$minutosTarde} minutos después del horario autorizado. ";
+            
+            $this->registrarBitacora(
+                'SALIDA_TARDIA',
+                "Salida tardía registrada - Visitante: {$visita->nombre_visitante}, Tardanza: {$minutosTarde} minutos",
+                $visita->id
+            );
+        }
+
+        $observacionesFinales = $observacionesExtra . ($request->observaciones ?? '');
+
         $visita->update([
             'estado' => 'finalizada',
             'hora_salida' => Carbon::now(),
             'user_salida_id' => Auth::id(),
-            'observaciones' => $request->observaciones
+            'observaciones' => $observacionesFinales
         ]);
 
-        // Registrar salida en bitácora
         $this->registrarBitacora(
             'REGISTRAR_SALIDA',
             "Salida registrada - Visitante: {$visita->nombre_visitante}, CI: {$visita->ci_visitante}",
             $visita->id
         );
 
+        $mensaje = 'Salida registrada correctamente';
+        if ($ahora > $finVisita) {
+            $minutosTarde = $ahora->diffInMinutes($finVisita);
+            $mensaje .= " (TARDÍA: {$minutosTarde} minutos)";
+        }
+
         return redirect()->route('visitas.show', $visita)
-            ->with('success', 'Salida registrada correctamente');
+            ->with('success', $mensaje);
     }
 
-    // Panel de control para guardia
+    // PANEL DE GUARDIA - SOLO PORTERO Y ADMIN
     public function panelGuardia()
     {
-        $user = Auth::user();
-        
-        // Solo guardia y admin pueden acceder al panel
-        $rol = $this->rol;
-        if ($rol == 'Residente') {
+        // 🚪 Solo PORTERO y 🔧 ADMIN pueden acceder al panel
+        if (!$this->tieneAlgunPermiso(['operar porteria', 'administrar visitas'])) {
             abort(403, 'No tienes permisos para acceder al Panel de Guardia');
         }
         
-        // Solo traer visitas en curso que SÍ tengan hora_entrada registrada
-        $visitasEnCurso = Visita::enCurso()
+        $visitasEnCurso = Visita::where('estado', 'en_curso')
             ->whereNotNull('hora_entrada')
             ->with('residente')
             ->get();
             
-        $visitasPendientes = Visita::pendientes()
-            ->whereBetween('fecha_inicio', [Carbon::now(), Carbon::now()->addHours(2)])
+        $visitasPendientes = Visita::where('estado', 'pendiente')
+            ->where('fecha_inicio', '<=', Carbon::now()->addHours(2))
+            ->where('fecha_inicio', '>=', Carbon::now()->subMinutes(30))
             ->with('residente')
             ->get();
 
         return view('visitas.panel-guardia', compact('visitasEnCurso', 'visitasPendientes'));
     }
 
-    // Buscar visitas por código (API para guardia)
+    // BUSCAR POR CÓDIGO - SOLO PORTERO Y ADMIN
     public function buscarPorCodigo(Request $request)
     {
-        $user = Auth::user();
-        
-        // Solo guardia y admin pueden buscar códigos
-        $rol = $this->rol;
-        if ($rol == 'Residente') {
+        // 🚪 Solo PORTERO y 🔧 ADMIN pueden buscar códigos
+        if (!$this->tieneAlgunPermiso(['operar porteria', 'administrar visitas'])) {
             return response()->json(['success' => false, 'message' => 'No tienes permisos']);
         }
         

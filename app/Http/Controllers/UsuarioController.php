@@ -28,6 +28,11 @@ class UsuarioController extends Controller
         return view('users.index', compact('users'));
     }
 
+    public function miPerfil()
+    {
+        $user = auth()->user();
+        return view('users.perfil', compact('user'));
+    }
 
     public function create()
     {

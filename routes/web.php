@@ -164,3 +164,21 @@ Route::resource('notificaciones', NotificacionController::class)->parameters([
     'notificaciones' => 'notificacion',
 ]);
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+Route::get('/mi-perfil', [UsuarioController::class, 'miPerfil'])->name('users.perfil');
+

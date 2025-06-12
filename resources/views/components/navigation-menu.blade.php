@@ -9,30 +9,30 @@
                     Inicio
                 </a>
                 <!-- -->
-@php
-        use Illuminate\Support\Facades\Auth;
-        use App\Models\Notificacion;
+                @php
+                use Illuminate\Support\Facades\Auth;
+                use App\Models\Notificacion;
 
-        $notificacionesPendientes = 0;
+                $notificacionesPendientes = 0;
 
-        if (Auth::check() && Auth::user()->residente_id) {
-            $notificacionesPendientes = Notificacion::where('residente_id', Auth::user()->residente_id)
+                if (Auth::check() && Auth::user()->residente_id) {
+                $notificacionesPendientes = Notificacion::where('residente_id', Auth::user()->residente_id)
                 ->where('leida', false)
                 ->count();
-        }
-    @endphp
+                }
+                @endphp
 
-    <li class="nav-item">
-        <a class="nav-link position-relative" href="{{ route('notificaciones.index') }}" title="Notificaciones">
-            <i class="fas fa-bell"></i>
-            @if($notificacionesPendientes > 0)
-                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                    {{ $notificacionesPendientes }}
-                    <span class="visually-hidden">notificaciones no leídas</span>
-                </span>
-            @endif
-        </a>
-    </li>
+                <li class="nav-item">
+                    <a class="nav-link position-relative" href="{{ route('notificaciones.index') }}" title="Notificaciones">
+                        <i class="fas fa-bell"></i>
+                        @if($notificacionesPendientes > 0)
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                            {{ $notificacionesPendientes }}
+                            <span class="visually-hidden">notificaciones no leídas</span>
+                        </span>
+                        @endif
+                    </a>
+                </li>
 
                 <div class="sb-sidenav-menu-heading">Módulos2</div>
 
@@ -51,6 +51,8 @@
 
                         <a class="nav-link" href="{{ route('users.index') }}">Usuarios</a>
                         @endcan
+                        <a class="nav-link" href="{{ route('users.perfil') }}">Perfil</a>
+                        
                         @can('ver roles')
 
                         <a class="nav-link" href="{{ route('roles.index') }}">Roles y Permisos</a>
@@ -165,8 +167,8 @@
                             </nav>
                         </div>
 
-                            {{-- Gestión de Áreas Comunes --}}
-                        <a  class="nav-link {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? '' : 'collapsed' }}"
+                        {{-- Gestión de Áreas Comunes --}}
+                        <a class="nav-link {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? '' : 'collapsed' }}"
                             href="#" data-bs-toggle="collapse" data-bs-target="#collapseAreas"
                             aria-expanded="{{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'true' : 'false' }}"
                             aria-controls="collapseAreas">
@@ -174,21 +176,22 @@
                             Gestión de Áreas Comunes
                             <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
                         </a>
-                        <div  class="collapse {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'show' : '' }}"
+                        <div class="collapse {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'show' : '' }}"
                             id="collapseAreas" data-bs-parent="#collapseFinanzas">
                             <nav class="sb-sidenav-menu-nested nav">
                                 {{-- Catálogo de Áreas --}}
-                                <a  class="nav-link {{ request()->routeIs('areas-comunes.index') ? 'active' : '' }}"
+                                <a class="nav-link {{ request()->routeIs('areas-comunes.index') ? 'active' : '' }}"
                                     href="{{ route('areas-comunes.index') }}">Catálogo
                                 </a>
                                 {{-- Reservas --}}
-                                <a  class="nav-link {{ request()->routeIs('reservas.index') ? 'active' : '' }}"
+                                <a class="nav-link {{ request()->routeIs('reservas.index') ? 'active' : '' }}"
                                     href="{{ route('reservas.index') }}">Reservas
                                 </a>
                             </nav>
                         </div>
                         {{-- Multas --}}
-                        <a class="nav-link" href="{{route('multas.index')}}"><div class="sb-nav-link-icon"><i class="fas fa-gavel"></i></div>
+                        <a class="nav-link" href="{{route('multas.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-gavel"></i></div>
                             Panel de Multas
                         </a>
                     </nav>
@@ -210,40 +213,40 @@
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="#">Calificaciones de Servicios</a>
                         <a class="nav-link" href="#">Comunicados y Noticias</a>
-                        <a class="nav-link" href="#">Reclamos y Sugerencias</a>                       
+                        <a class="nav-link" href="#">Reclamos y Sugerencias</a>
                     </nav>
                 </div>
 
 
-            {{-- Seguridad y Accesos --}}
-            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
-                data-bs-target="#collapseSeguridad" aria-expanded="false" aria-controls="collapseSeguridad">
-                <div class="sb-nav-link-icon"><i class="fas fa-shield-alt"></i></div>
-                Seguridad y Accesos
-                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-            </a>
-            <div class="collapse" id="collapseSeguridad" data-bs-parent="#sidenavAccordion">
-                <nav class="sb-sidenav-menu-nested nav">
-                    <a class="nav-link" href="#">Control de Acceso</a>
-                    
-                    {{--Solo para usuarios con permiso 'gestionar visitas' --}}
-                    @can('gestionar visitas')
-                    <a class="nav-link" href="{{ route('visitas.index') }}">Visitas</a>
-                    @endcan
-                    
-                    {{--Solo para usuarios con permiso 'operar porteria' --}}
-                    @can('operar porteria')
-                    <a class="nav-link" href="{{ route('visitas.panel-guardia') }}">Panel Guardia</a>
-                    @endcan
-                    
-                    {{-- Solo para usuarios con permiso 'administrar visitas' --}}
-                    @can('administrar visitas')
+                {{-- Seguridad y Accesos --}}
+                <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
+                    data-bs-target="#collapseSeguridad" aria-expanded="false" aria-controls="collapseSeguridad">
+                    <div class="sb-nav-link-icon"><i class="fas fa-shield-alt"></i></div>
+                    Seguridad y Accesos
+                    <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                </a>
+                <div class="collapse" id="collapseSeguridad" data-bs-parent="#sidenavAccordion">
+                    <nav class="sb-sidenav-menu-nested nav">
+                        <a class="nav-link" href="#">Control de Acceso</a>
+
+                        {{--Solo para usuarios con permiso 'gestionar visitas' --}}
+                        @can('gestionar visitas')
+                        <a class="nav-link" href="{{ route('visitas.index') }}">Visitas</a>
+                        @endcan
+
+                        {{--Solo para usuarios con permiso 'operar porteria' --}}
+                        @can('operar porteria')
+                        <a class="nav-link" href="{{ route('visitas.panel-guardia') }}">Panel Guardia</a>
+                        @endcan
+
+                        {{-- Solo para usuarios con permiso 'administrar visitas' --}}
+                        @can('administrar visitas')
                         <a class="nav-link" href="{{ route('visitas.mostrar-validar-codigo') }}">Validar Código Visita</a>
-                    @endcan
-                    
-                    <a class="nav-link" href="#">Seguridad y Vigilancia</a>
-                </nav>
-            </div>
+                        @endcan
+
+                        <a class="nav-link" href="#">Seguridad y Vigilancia</a>
+                    </nav>
+                </div>
 
 
                 {{-- Comunidad y Reportes --}}

@@ -24,6 +24,7 @@
                 <th>Hora Reserva</th>
                 <th>Residente</th>
                 <th>Acciones</th>
+                <th>Verificación</th> 
             </tr>
         </thead>
         <tbody>
@@ -59,6 +60,14 @@
                         <button class="btn btn-sm btn-danger" onclick="return confirm('¿Eliminar esta reserva?')">Eliminar</button>
                     </form>
                 </td>
+                <td>
+
+        <a href="{{ route('reservas.verificar-inventario', $reserva->id) }}" class="btn btn-sm btn-info">
+            Verificar
+        </a>
+
+</td>
+
             </tr>
             @endforeach
         </tbody>

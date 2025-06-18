@@ -26,6 +26,8 @@ use App\Http\Controllers\UnidadController;
 use App\Http\Controllers\MultaController;
 use App\Http\Controllers\VisitaController;
 use App\Http\Controllers\NotificacionController;
+
+use App\Http\Controllers\InventarioController;
 //gestion de multas
 Route::middleware(['auth'])->group(function () {
     Route::resource('multas', MultaController::class)->parameters([
@@ -106,14 +108,18 @@ Route::get('/stripe/cancel', function () {
 })->name('pagos.stripe.cancel');
 
 
+Route::middleware(['auth'])->group(function () {
+    Route::resource('inventario', InventarioController::class);
+});
+Route::get('/inventario/{id}', [InventarioController::class, 'show'])->name('inventario.show');
+
+Route::get('reservas/{reserva}/verificar-inventario', [ReservaController::class, 'verificarInventario'])->name('reservas.verificar-inventario');
+Route::post('/reservas/{reserva}/verificar-inventario', [ReservaController::class, 'guardarVerificacion'])->name('reservas.guardar-verificacion');
 
 
-
-
-
-
-
-
+Route::get('/inventario', [InventarioController::class, 'index'])->name('inventario.index');
+Route::get('/inventario/filtrar', [InventarioController::class, 'filtrar'])->name('inventario.filtrar');
+ 
 
 
 

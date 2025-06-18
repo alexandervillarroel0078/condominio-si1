@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\VerificacionInventario;
 use App\Models\AreaComun;
 use App\Models\Reserva;
 use Illuminate\Http\Request;
@@ -220,4 +220,37 @@ class ReservaController extends Controller
 
         return response()->json($horasPosiblesStrings);
     }
+
+
+
+public function verificarInventario($reserva_id)
+{
+    $reserva = Reserva::with('areaComun.inventarios')->findOrFail($reserva_id);
+    return view('reservas.verificar_inventario', compact('reserva'));
+}
+
+public function guardarVerificacion(Request $request, $reserva_id)
+{
+    $request->validate([
+        'verificaciones' => 'required|array',
+        'verificaciones.*.estado' => 'required|in:ok,faltante,roto,otro',
+        'verificaciones.*.observacion' => 'nullable|string|max:255',
+    ]);
+
+    foreach ($request->verificaciones as $inventario_id => $verificacion) {
+        VerificacionInventario::updateOrCreate(
+            [
+                'reserva_id' => $reserva_id,
+                'inventario_id' => $inventario_id,
+            ],
+            [
+                'estado' => $verificacion['estado'],
+                'observacion' => $verificacion['observacion'] ?? null,
+            ]
+        );
+    }
+
+    return redirect()->route('reservas.index')->with('success', 'Verificación guardada correctamente.');
+}
+
 }

@@ -52,7 +52,7 @@
                         <a class="nav-link" href="{{ route('users.index') }}">Usuarios</a>
                         @endcan
                         <a class="nav-link" href="{{ route('users.perfil') }}">Perfil</a>
-                        
+
                         @can('ver roles')
 
                         <a class="nav-link" href="{{ route('roles.index') }}">Roles y Permisos</a>
@@ -194,13 +194,14 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-gavel"></i></div>
                             Panel de Multas
                         </a>
+
+                        <a class="nav-link {{ request()->routeIs('inventario.*') ? 'active' : '' }}" href="{{ route('inventario.index') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-boxes"></i></div>
+                            Inventario
+                        </a>
+
                     </nav>
                 </div>
-
-
-
-
-
 
                 <a class="nav-link collapsed" href="#" data-bs-toggle="collapse"
                     data-bs-target="#collapseComunicacion" aria-expanded="false"

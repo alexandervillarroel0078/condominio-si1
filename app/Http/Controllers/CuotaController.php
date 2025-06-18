@@ -150,7 +150,7 @@ class CuotaController extends Controller
             'estado',
             'observacion'
         ]));
-
+        
         return redirect()->route('cuotas.index')->with('success', 'Cuota actualizada correctamente.');
     }
 

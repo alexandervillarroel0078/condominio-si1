@@ -24,6 +24,7 @@ use App\Http\Controllers\AreaComunController;
 use App\Http\Controllers\ReservaController;
 use App\Http\Controllers\UnidadController;
 use App\Http\Controllers\VisitaController; 
+use App\Http\Controllers\RegistroSeguridadController;
 
 // gestión de áreas comunes y reservas
 Route::middleware(['auth'])->group(function () {
@@ -53,6 +54,51 @@ Route::middleware(['auth'])->group(function () {
         ->name('visitas.panel-guardia');
     Route::get('/buscar-codigo', [VisitaController::class, 'buscarPorCodigo'])
         ->name('visitas.buscar-codigo');
+});
+
+// GESTIÓN DE VISITAS 
+Route::middleware(['auth'])->group(function () {
+    Route::resource('visitas', VisitaController::class);
+    
+    // Ruta para mostrar formulario de validación
+    Route::get('/validar-codigo', [VisitaController::class, 'mostrarValidarCodigo'])
+        ->name('visitas.mostrar-validar-codigo');
+    
+    // Rutas específicas para guardias (control en controlador)
+    Route::post('/visitas/validar-codigo', [VisitaController::class, 'validarCodigo'])
+        ->name('visitas.validar-codigo');
+    Route::post('/visitas/{visita}/entrada', [VisitaController::class, 'registrarEntrada'])
+        ->name('visitas.entrada');
+    Route::post('/visitas/{visita}/salida', [VisitaController::class, 'registrarSalida'])
+        ->name('visitas.salida');
+    Route::get('/panel-guardia', [VisitaController::class, 'panelGuardia'])
+        ->name('visitas.panel-guardia');
+    Route::get('/buscar-codigo', [VisitaController::class, 'buscarPorCodigo'])
+        ->name('visitas.buscar-codigo');
+});
+
+// GESTIÓN DE SEGURIDAD Y VIGILANCIA
+Route::middleware(['auth'])->group(function () {
+    // Rutas básicas CRUD
+    Route::resource('seguridad', RegistroSeguridadController::class);
+    
+    // Rutas específicas para resolución de incidentes (control en controlador)
+    Route::post('/seguridad/{id}/resolver', [RegistroSeguridadController::class, 'resolver'])
+        ->name('seguridad.resolver');
+    
+    // Rutas específicas para residentes
+    Route::get('/reportar-incidente', [RegistroSeguridadController::class, 'reportarIncidente'])
+        ->name('seguridad.reportar-incidente');
+    
+    Route::get('/mis-reportes', [RegistroSeguridadController::class, 'misReportes'])
+        ->name('seguridad.mis-reportes');
+    
+    // Ruta para guardar incidente rápido (POST del formulario de reportar-incidente)
+    Route::post('/reportar-incidente', [RegistroSeguridadController::class, 'store'])
+        ->name('seguridad.reportar-incidente.store');
+    // Ruta para marcar en revisión
+    Route::post('/seguridad/{registro}/revisar', [RegistroSeguridadController::class, 'marcarEnRevision'])
+    ->name('seguridad.marcar-revision');
 });
 
 // GESTIÓN DE GASTOS

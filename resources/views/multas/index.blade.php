@@ -90,15 +90,35 @@
                                 <form action="{{ route('multas.destroy', $multa->id) }}" method="POST" style="display:inline;">
                                     @csrf
                                     @method('DELETE')
-                                    <button class="btn btn-danger btn-sm"
-                                        onclick="return confirm('¿Eliminar esta multa?')">
-                                        Eliminar
-                                    </button>
+                                    <button type="button" class="btn btn-danger btn-sm" data-bs-toggle="modal" data-bs-target="#confirmarEliminar-{{ $multa->id }}">
+                                        Eliminar</button>
                                 </form>
                                 @endif
                             </div>
                         </td>
                     </tr>
+                    <!-- Modal de confirmación de eliminación -->
+                    <div class="modal fade" id="confirmarEliminar-{{ $multa->id }}" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="confirmarEliminarLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Eliminar multa</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    ¿Desea eliminar la multa emitida a: {{ optional($multa->residente)->nombre_completo ?? optional($multa->empleado)->nombre_completo ?? 'N/A' }}?
+                                </div>
+                                <div class="modal-footer">
+                                    <form action="{{ route('multas.destroy', $multa->id) }}" method="POST">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-primary btn-sm">Aceptar</button>
+                                    </form>
+                                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                     @endforeach
                 </tbody>
             </table>

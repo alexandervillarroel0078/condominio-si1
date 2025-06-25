@@ -26,8 +26,20 @@ use App\Http\Controllers\UnidadController;
 use App\Http\Controllers\MultaController;
 use App\Http\Controllers\VisitaController;
 use App\Http\Controllers\NotificacionController;
-
 use App\Http\Controllers\InventarioController;
+use App\Http\Controllers\ReclamoController;
+
+//gestion de reclamos
+Route::middleware(['auth'])->group(function () {
+    Route::resource('reclamos', ReclamoController::class)->parameters([
+        'reclamos' => 'reclamo'
+    ]);
+});
+Route::patch('reclamos/{reclamo}/respuesta', [App\Http\Controllers\ReclamoController::class, 'respuesta'])
+     ->name('reclamos.respuesta')
+     ->middleware('auth');
+
+
 //gestion de multas
 Route::middleware(['auth'])->group(function () {
     Route::resource('multas', MultaController::class)->parameters([
@@ -119,7 +131,7 @@ Route::post('/reservas/{reserva}/verificar-inventario', [ReservaController::clas
 
 Route::get('/inventario', [InventarioController::class, 'index'])->name('inventario.index');
 Route::get('/inventario/filtrar', [InventarioController::class, 'filtrar'])->name('inventario.filtrar');
- 
+
 
 
 

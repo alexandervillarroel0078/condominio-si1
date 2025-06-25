@@ -214,7 +214,10 @@
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="#">Calificaciones de Servicios</a>
                         <a class="nav-link" href="#">Comunicados y Noticias</a>
-                        <a class="nav-link" href="#">Reclamos y Sugerencias</a>
+                        {{-- Reclamos y Sugerencias --}}
+                        <a class="nav-link" href="{{route('reclamos.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-paper-plane"></i></div>
+                            Reclamos y Sugerencias</a>
                     </nav>
                 </div>
 

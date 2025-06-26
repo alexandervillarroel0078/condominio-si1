@@ -1,7 +1,6 @@
 <?php
 
 namespace Database\Seeders;
-
 use App\Models\AreaComun;
 use App\Models\CargoEmpleados;
 use App\Models\Cliente;
@@ -39,6 +38,8 @@ class DatabaseSeeder extends Seeder
             MultaSeeder::class,
             CategoriaInventarioSeeder::class,
             InventarioSeeder::class,
+            ComunicadoSeeder::class,
+            ReclamoSeeder::class,
         ]);
     }
 }

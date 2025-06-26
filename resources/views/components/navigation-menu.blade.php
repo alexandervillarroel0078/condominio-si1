@@ -9,30 +9,6 @@
                     Inicio
                 </a>
                 <!-- -->
-                @php
-                use Illuminate\Support\Facades\Auth;
-                use App\Models\Notificacion;
-
-                $notificacionesPendientes = 0;
-
-                if (Auth::check() && Auth::user()->residente_id) {
-                $notificacionesPendientes = Notificacion::where('residente_id', Auth::user()->residente_id)
-                ->where('leida', false)
-                ->count();
-                }
-                @endphp
-
-                <li class="nav-item">
-                    <a class="nav-link position-relative" href="{{ route('notificaciones.index') }}" title="Notificaciones">
-                        <i class="fas fa-bell"></i>
-                        @if($notificacionesPendientes > 0)
-                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-                            {{ $notificacionesPendientes }}
-                            <span class="visually-hidden">notificaciones no leídas</span>
-                        </span>
-                        @endif
-                    </a>
-                </li>
 
                 <div class="sb-sidenav-menu-heading">Módulos2</div>
 
@@ -213,8 +189,12 @@
                 <div class="collapse" id="collapseComunicacion" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="#">Calificaciones de Servicios</a>
-                        <a class="nav-link" href="#">Comunicados y Noticias</a>
+                        <a class="nav-link" href="{{ route('comunicados.index') }}">Comunicados y Noticias</a>
                         <a class="nav-link" href="#">Reclamos y Sugerencias</a>
+                        {{-- Reclamos y Sugerencias --}}
+                        <a class="nav-link" href="{{route('reclamos.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-paper-plane"></i></div>
+                            Reclamos y Sugerencias</a>
                     </nav>
                 </div>
 

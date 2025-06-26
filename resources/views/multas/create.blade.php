@@ -30,16 +30,18 @@
                    value="{{ old('monto') }}">
         </div>
 
-        <div class="mb-3">
-            <label for="fechaEmision" class="form-label">Fecha de Emisión</label>
-            <input type="date" name="fechaEmision" id="fechaEmision" class="form-control" required
-                   value="{{ old('fechaEmision', now()->format('Y-m-d')) }}">
-        </div>
+        <div class="row">
+            <div class="col-md-6 mb-3">
+                <label for="fechaEmision" class="form-label">Fecha de Emisión</label>
+                <input type="date" name="fechaEmision" id="fechaEmision" class="form-control" required
+                    value="{{ old('fechaEmision', now()->format('Y-m-d')) }}">
+            </div>
 
-        <div class="mb-3">
-            <label for="fechaLimite" class="form-label">Fecha Límite</label>
-            <input type="date" name="fechaLimite" id="fechaLimite" class="form-control" required
-                   value="{{ old('fechaLimite', now()->addDays(7)->format('Y-m-d')) }}">
+            <div class="col-md-6 mb-3">
+                <label for="fechaLimite" class="form-label">Fecha Límite</label>
+                <input type="date" name="fechaLimite" id="fechaLimite" class="form-control" required
+                    value="{{ old('fechaLimite', now()->addDays(7)->format('Y-m-d')) }}">
+            </div>
         </div>
 
         <div class="mb-3">

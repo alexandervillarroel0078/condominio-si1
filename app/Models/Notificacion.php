@@ -17,6 +17,7 @@ class Notificacion extends Model
         'tipo',
         'titulo',
         'residente_id',
+        'ruta',
         'leida',
     ];
 

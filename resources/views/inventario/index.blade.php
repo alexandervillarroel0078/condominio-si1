@@ -7,12 +7,12 @@
     <a href="{{ route('inventario.create') }}" class="btn btn-success mb-3">Nuevo Activo</a>
 
     @if(session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+    <div class="alert alert-success">{{ session('success') }}</div>
     @endif
 
     {{-- FORMULARIO DE FILTRO --}}
     <form method="GET" action="{{ route('inventario.index') }}" class="card p-3 mb-3">
-    <div class="row g-2">
+        <div class="row g-2">
             <div class="col-md-3">
                 <label>Desde</label>
                 <input type="date" name="fecha_inicio" class="form-control" value="{{ request('fecha_inicio') }}">
@@ -26,9 +26,9 @@
                 <select name="categoria_id" class="form-select">
                     <option value="">Todas</option>
                     @foreach($categorias as $cat)
-                        <option value="{{ $cat->id }}" {{ request('categoria_id') == $cat->id ? 'selected' : '' }}>
-                            {{ $cat->nombre }}
-                        </option>
+                    <option value="{{ $cat->id }}" {{ request('categoria_id') == $cat->id ? 'selected' : '' }}>
+                        {{ $cat->nombre }}
+                    </option>
                     @endforeach
                 </select>
             </div>
@@ -37,9 +37,9 @@
                 <select name="area_comun_id" class="form-select">
                     <option value="">Todas</option>
                     @foreach($areas as $area)
-                        <option value="{{ $area->id }}" {{ request('area_comun_id') == $area->id ? 'selected' : '' }}>
-                            {{ $area->nombre }}
-                        </option>
+                    <option value="{{ $area->id }}" {{ request('area_comun_id') == $area->id ? 'selected' : '' }}>
+                        {{ $area->nombre }}
+                    </option>
                     @endforeach
                 </select>
             </div>
@@ -60,6 +60,17 @@
         </div>
     </form>
 
+    <div class="mb-2">
+        <a href="{{ route('inventario.exportar.csv', request()->query()) }}"
+            class="btn btn-outline-success btn-sm me-2">
+            📥 Exportar CSV
+        </a>
+
+        <a href="{{ route('inventario.exportar.pdf', request()->query()) }}"
+            class="btn btn-outline-danger btn-sm">
+            📄 Exportar PDF
+        </a>
+    </div>
     {{-- TABLA --}}
     <table class="table table-bordered">
         <thead>
@@ -74,25 +85,43 @@
         </thead>
         <tbody>
             @forelse ($inventarios as $item)
-                <tr>
-                    <td>{{ $item->nombre }}</td>
-                    <td>{{ $item->categoria->nombre }}</td>
-                    <td>{{ $item->estado }}</td>
-                    <td>{{ $item->responsable->name ?? 'No asignado' }}</td>
-                    <td>{{ $item->areaComun->nombre ?? 'N/A' }}</td>
-                    <td>
-                        <a href="{{ route('inventario.edit', $item) }}" class="btn btn-sm btn-primary">Editar</a>
-                        <form action="{{ route('inventario.destroy', $item) }}" method="POST" class="d-inline-block" onsubmit="return confirm('¿Eliminar este activo?')">
-                            @csrf @method('DELETE')
-                            <button class="btn btn-sm btn-danger">Eliminar</button>
-                        </form>
-                        <a href="{{ route('inventario.show', $item->id) }}" class="btn btn-sm btn-info">Ver</a>
-                    </td>
-                </tr>
+            <tr>
+                <td>{{ $item->nombre }}</td>
+                <td>{{ $item->categoria->nombre }}</td>
+                <td>
+                    @php
+                    $colores = [
+                    'disponible' => 'success',
+                    'en_uso' => 'primary',
+                    'mantenimiento' => 'warning',
+                    'prestado' => 'info',
+                    'extraviado' => 'danger',
+                    'baja' => 'secondary',
+                    ];
+                    $estado = $item->estado;
+                    $colorClase = $colores[$estado] ?? 'dark';
+                    @endphp
+
+                    <span class="badge bg-{{ $colorClase }}">
+                        {{ ucfirst(str_replace('_', ' ', $estado)) }}
+                    </span>
+                </td>
+
+                <td>{{ $item->responsable->name ?? 'No asignado' }}</td>
+                <td>{{ $item->areaComun->nombre ?? 'N/A' }}</td>
+                <td>
+                    <a href="{{ route('inventario.edit', $item) }}" class="btn btn-sm btn-primary">Editar</a>
+                    <form action="{{ route('inventario.destroy', $item) }}" method="POST" class="d-inline-block" onsubmit="return confirm('¿Eliminar este activo?')">
+                        @csrf @method('DELETE')
+                        <button class="btn btn-sm btn-danger">Eliminar</button>
+                    </form>
+                    <a href="{{ route('inventario.show', $item->id) }}" class="btn btn-sm btn-info">Ver</a>
+                </td>
+            </tr>
             @empty
-                <tr>
-                    <td colspan="6">No se encontraron resultados.</td>
-                </tr>
+            <tr>
+                <td colspan="6">No se encontraron resultados.</td>
+            </tr>
             @endforelse
         </tbody>
     </table>

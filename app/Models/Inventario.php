@@ -25,6 +25,12 @@ class Inventario extends Model
         'user_id',
         'area_comun_id',
     ];
+
+    protected $casts = [
+        'fecha_adquisicion' => 'datetime',    
+        'fecha_baja'        => 'datetime',
+    ];
+
     public function user()
     {
         return $this->belongsTo(User::class);

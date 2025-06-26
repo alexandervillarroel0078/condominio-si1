@@ -22,9 +22,19 @@ $inventario = $inventario ?? null;
 
 <div class="row mt-3">
     <div class="col-md-6">
-        <label>Estado</label>
-        <input type="text" name="estado" class="form-control" value="{{ old('estado', $inventario->estado ?? 'disponible') }}">
-    </div>
+    <label>Estado</label>
+    <select name="estado" class="form-control" required>
+        @php
+            $estados = ['disponible', 'en_uso', 'mantenimiento', 'prestado', 'extraviado', 'baja'];
+        @endphp
+        @foreach($estados as $estado)
+            <option value="{{ $estado }}" {{ old('estado', $inventario->estado ?? 'disponible') == $estado ? 'selected' : '' }}>
+                {{ ucfirst(str_replace('_', ' ', $estado)) }}
+            </option>
+        @endforeach
+    </select>
+</div>
+
     <div class="col-md-6">
         <label>Tipo de adquisición</label>
         <input type="text" name="tipo_adquisicion" class="form-control" value="{{ old('tipo_adquisicion', $inventario->tipo_adquisicion ?? '') }}">
@@ -56,7 +66,12 @@ $inventario = $inventario ?? null;
     </div>
     <div class="col-md-6">
         <label>Fecha de adquisición</label>
-        <input type="text" class="form-control" value="{{ isset($inventario) ? $inventario->fecha_adquisicion->format('d/m/Y') : now()->format('d/m/Y') }}" readonly>
+        <input type="text" class="form-control"
+            value="{{ isset($inventario)
+                    ? $inventario->fecha_adquisicion->format('d/m/Y')
+                    : now()->format('d/m/Y') }}"
+            readonly>
+
     </div>
 
 

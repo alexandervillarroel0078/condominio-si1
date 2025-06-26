@@ -141,11 +141,14 @@ Route::post('/reservas/{reserva}/verificar-inventario', [ReservaController::clas
 
 Route::get('/inventario', [InventarioController::class, 'index'])->name('inventario.index');
 Route::get('/inventario/filtrar', [InventarioController::class, 'filtrar'])->name('inventario.filtrar');
+ 
+Route::get('/pdf-test', [InventarioController::class, 'testPdf']);
+Route::get('/inventario/exportar/csv', [InventarioController::class, 'exportarCsv'])
+      ->name('inventario.exportar.csv');
 
-
-
-
-
+Route::get('/inventario/exportar/pdf', [InventarioController::class, 'exportarPdf'])
+      ->name('inventario.exportar.pdf');
+ 
 
 
 

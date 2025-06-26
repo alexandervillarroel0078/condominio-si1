@@ -110,6 +110,7 @@ class PagoController extends Controller
 
         return view('pagos.opciones_pago', [
             'entidad' => $cuota,
+            'tipo' => 'cuota',
             'qrBase64' => $qrBase64
         ]);
     }
@@ -209,10 +210,119 @@ class PagoController extends Controller
 
         return view('pagos.opciones_pago', [
             'entidad' => $multa,
+            'tipo' => 'multa',
             'qrBase64' => $qrBase64
         ]);
     }
-    
+
+    public function pagoQRMulta(Request $request)
+    {
+        $request->validate([
+            'multa_id'    => 'required|exists:multas,id',
+            'comprobante' => 'required|image|max:2048',
+        ]);
+
+        $multa = Multa::findOrFail($request->multa_id);
+        $user  = auth()->user();
+
+        // Sólo el residente o empleado al que se la multa pertenece puede subir comprobante
+        $esResidente = $user->residente_id && $user->residente_id === $multa->residente_id;
+        $esEmpleado  = $user->empleado_id  && $user->empleado_id  === $multa->empleado_id;
+        if (! ($esResidente || $esEmpleado) ) {
+            abort(403, 'No autorizado.');
+        }
+
+        // Guardar archivo
+        $ruta = $request->file('comprobante')->store('comprobantes/multas', 'public');
+
+        // Crear el pago
+        Pago::create([
+            'multa_id'     => $multa->id,
+            'user_id'      => $user->id,
+            'monto_pagado' => $multa->monto,
+            'fecha_pago'   => now(),
+            'metodo'       => 'QR',
+            'estado'       => 'pendiente',
+            'comprobante'  => $ruta,
+        ]);
+
+        $multa->estado = 'pagada';
+        $multa->save();
+        $this->registrarEnBitacora('Pago de multa registrado', $multa->id);
+
+        return redirect()
+            ->route('multas.index')
+            ->with('success', 'Comprobante de multa enviado. Esperando validación.');
+    }
+
+    public function pagoStripeMulta(Request $request)
+    {
+        // Validar que venga la multa
+        $request->validate([
+            'multa_id' => 'required|exists:multas,id',
+        ]);
+
+        $multa = Multa::findOrFail($request->multa_id);
+        $user  = auth()->user();
+
+        // Sólo su propio residente o empleado (o admin) puede pagar
+        $esResidente = $user->residente_id && $user->residente_id === $multa->residente_id;
+        $esEmpleado  = $user->empleado_id  && $user->empleado_id  === $multa->empleado_id;
+        if (! $user->hasRole('ADMINISTRADOR') && ! ($esResidente || $esEmpleado)) {
+            abort(403);
+        }
+
+        Stripe::setApiKey(config('services.stripe.secret'));
+
+        $session = Session::create([
+            'payment_method_types' => ['card'],
+            'line_items' => [[
+                'price_data' => [
+                    'currency' => 'bob',
+                    'product_data' => [
+                        'name' => 'Pago de multa: ' . $multa->motivo,
+                    ],
+                    'unit_amount' => $multa->monto * 100,
+                ],
+                'quantity' => 1,
+            ]],
+            'mode' => 'payment',
+            'success_url' => route('pagos.stripe.success.multa', ['multa' => $multa->id]),
+            'cancel_url'  => route('pagos.stripe.cancel'),
+        ]);
+
+        return redirect($session->url);
+    }
+
+    /**
+     * Callback de Stripe exitoso para multa.
+     */
+    public function stripeSuccessMulta($multaId)
+    {
+        $multa = Multa::findOrFail($multaId);
+        $user  = auth()->user();
+
+        // Creo el registro de pago
+        $pago = Pago::create([
+            'multa_id'     => $multa->id,
+            'user_id'      => $user->id,
+            'monto_pagado' => $multa->monto,
+            'fecha_pago'   => now(),
+            'metodo'       => 'Stripe',
+            'estado'       => 'aprobado',
+        ]);
+
+        // Marco la multa como pagada
+        $multa->estado = 'pagada';
+        $multa->save();
+
+        $this->registrarEnBitacora('Pago de multa registrado', $multa->id);
+
+        return redirect()
+            ->route('pagos.mis_multa')  // o donde muestres “mis multas”
+            ->with('success', 'Pago de multa exitoso con Stripe.');
+    }
+
     public function comprobante(Pago $pago)
     {
         // Validación de seguridad

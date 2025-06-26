@@ -42,8 +42,8 @@
         <div class="mb-3">
             <label for="estado" class="form-label">Estado</label>
             <select name="estado" class="form-select" required>
-                <option value="libre"        {{ old('estado', $areaComun->estado) == 'libre'        ? 'selected' : '' }}>Libre</option>
-                <option value="ocupado"      {{ old('estado', $areaComun->estado) == 'ocupado'      ? 'selected' : '' }}>Ocupado</option>
+                <option value="activo"        {{ old('estado', $areaComun->estado) == 'activo'        ? 'selected' : '' }}>Activo</option>
+                <option value="inactivo"      {{ old('estado', $areaComun->estado) == 'inactivo'      ? 'selected' : '' }}>Inactivo</option>
                 <option value="mantenimiento"{{ old('estado', $areaComun->estado) == 'mantenimiento'? 'selected' : '' }}>Mantenimiento</option>
             </select>
         </div>

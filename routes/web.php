@@ -27,8 +27,20 @@ use App\Http\Controllers\MultaController;
 use App\Http\Controllers\VisitaController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\ComunicadoController;
-
 use App\Http\Controllers\InventarioController;
+use App\Http\Controllers\ReclamoController;
+
+//gestion de reclamos
+Route::middleware(['auth'])->group(function () {
+    Route::resource('reclamos', ReclamoController::class)->parameters([
+        'reclamos' => 'reclamo'
+    ]);
+});
+Route::patch('reclamos/{reclamo}/respuesta', [App\Http\Controllers\ReclamoController::class, 'respuesta'])
+     ->name('reclamos.respuesta')
+     ->middleware('auth');
+
+
 //gestion de multas
 Route::middleware(['auth'])->group(function () {
     Route::resource('multas', MultaController::class)->parameters([
@@ -41,7 +53,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('areas-comunes', AreaComunController::class)->parameters([
         'areas-comunes' => 'areaComun'
     ]);
-    Route::resource('reservas', ReservaController::class);
+    Route::resource('reservas', ReservaController::class)->parameters([
+        'reservas' => 'reserva'
+    ]);
 });
 Route::get('/api/horas-libres', [ReservaController::class, 'horasLibres']);
 
@@ -89,6 +103,14 @@ Route::get('/pagos/create/cuota/{cuota}', [PagoController::class, 'createCuota']
 Route::get('/pagos/create/multa/{multa}', [PagoController::class, 'createMulta'])
     ->name('pagos.create.multa')
     ->middleware('auth');
+Route::post('/pagos/qr-multa', [PagoController::class, 'pagoQRMulta'])
+     ->name('pagos.qr.multa')
+     ->middleware('auth');
+Route::post('/pagos/stripe/multa', [PagoController::class, 'pagoStripeMulta'])
+     ->name('pagos.stripe.multa')
+     ->middleware('auth');
+Route::get('/stripe/success/multa/{multa}', [PagoController::class, 'stripeSuccessMulta'])
+     ->name('pagos.stripe.success.multa');
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('pagos', PagoController::class)->only(['index',  'store']);
@@ -121,10 +143,13 @@ Route::post('/reservas/{reserva}/verificar-inventario', [ReservaController::clas
 Route::get('/inventario', [InventarioController::class, 'index'])->name('inventario.index');
 Route::get('/inventario/filtrar', [InventarioController::class, 'filtrar'])->name('inventario.filtrar');
  
+Route::get('/pdf-test', [InventarioController::class, 'testPdf']);
+Route::get('/inventario/exportar/csv', [InventarioController::class, 'exportarCsv'])
+      ->name('inventario.exportar.csv');
 
-
-
-
+Route::get('/inventario/exportar/pdf', [InventarioController::class, 'exportarPdf'])
+      ->name('inventario.exportar.pdf');
+ 
 
 
 
@@ -184,12 +209,6 @@ Route::resource('comunicados', ComunicadoController::class);
 
 Route::post('/notificaciones/{id}/leer', [NotificacionController::class, 'marcarLeida'])->name('notificaciones.marcarLeida');
 Route::post('/notificaciones/{id}/ver', [NotificacionController::class, 'ver'])->name('notificaciones.ver');
-
-
-
-
-
-
 
 
 

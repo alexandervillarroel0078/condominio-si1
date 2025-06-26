@@ -25,4 +25,9 @@ class Residente extends Model
     {
         return $this->hasMany(Multa::class);
     }
+
+    public function reclamos()
+    {
+        return $this->hasMany(Reclamo::class);
+    }
 }

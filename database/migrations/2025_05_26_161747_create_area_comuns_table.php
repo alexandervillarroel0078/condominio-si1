@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Mantenimiento;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
@@ -15,7 +16,7 @@ return new class extends Migration
             $table->id();
             $table->string('nombre', 50);
             $table->decimal('monto',10,2);
-            $table->string('estado', 20)->default('libre'); //libre, ocupado y mantenimiento
+            $table->enum('estado', ['activo', 'inactivo', 'mantenimiento'])->default('activo');
             $table->timestamps();
         });
     }

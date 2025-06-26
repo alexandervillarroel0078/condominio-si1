@@ -5,12 +5,13 @@ use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration {
-    public function up(): void {
+    public function up(): void
+    {
         Schema::create('inventarios', function (Blueprint $table) {
             $table->id();
             $table->string('nombre');
             $table->text('descripcion')->nullable();
-            $table->string('estado')->default('disponible');
+            $table->string('estado')->default('disponible'); // disponible,en_uso, mantenimiento, prestado, extraviado, baja
             $table->date('fecha_adquisicion')->nullable();
             $table->string('tipo_adquisicion')->nullable(); // compra, donación, leasing
             $table->decimal('valor_estimado', 10, 2)->nullable();
@@ -28,7 +29,8 @@ return new class extends Migration {
         });
     }
 
-    public function down(): void {
+    public function down(): void
+    {
         Schema::dropIfExists('inventarios');
     }
 };

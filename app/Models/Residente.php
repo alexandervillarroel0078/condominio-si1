@@ -20,4 +20,14 @@ class Residente extends Model
     {
         return $this->nombre . ' ' . $this->apellido;
     }
+
+    public function multas()
+    {
+        return $this->hasMany(Multa::class);
+    }
+
+    public function reclamos()
+    {
+        return $this->hasMany(Reclamo::class);
+    }
 }

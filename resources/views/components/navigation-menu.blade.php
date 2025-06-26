@@ -9,6 +9,7 @@
                     Inicio
                 </a>
                 <!-- -->
+
                 <div class="sb-sidenav-menu-heading">Módulos2</div>
 
 
@@ -26,6 +27,8 @@
 
                         <a class="nav-link" href="{{ route('users.index') }}">Usuarios</a>
                         @endcan
+                        <a class="nav-link" href="{{ route('users.perfil') }}">Perfil</a>
+
                         @can('ver roles')
 
                         <a class="nav-link" href="{{ route('roles.index') }}">Roles y Permisos</a>
@@ -112,6 +115,14 @@
                                 @can('ver pagos')
                                 <a class="nav-link {{ request()->routeIs('pagos.index') ? 'active' : '' }}" href="{{ route('pagos.index') }}">Pagos Realizados</a>
                                 @endcan
+                                @auth
+                                @if(auth()->user()->residente)
+                                <a class="nav-link {{ request()->routeIs('pagos.mis_cuotas') ? 'active' : '' }}" href="{{ route('pagos.mis_cuotas') }}">
+                                    Mis Cuotas
+                                </a>
+                                @endif
+                                @endauth
+
                             </nav>
                         </div>
 
@@ -126,7 +137,6 @@
                         </a>
                         <div class="collapse {{ request()->routeIs('tipo-gastos.*') || request()->routeIs('gastos.*') ? 'show' : '' }}"
                             id="collapseGastos">
-
                             <nav class="sb-sidenav-menu-nested nav">
                                 <a class="nav-link {{ request()->routeIs('gastos.index') ? 'active' : '' }}" href="{{ route('gastos.index') }}">Lista de Gastos</a>
                                 <a class="nav-link {{ request()->routeIs('tipo-gastos.index') ? 'active' : '' }}" href="{{ route('tipo-gastos.index') }}">Tipos de Gastos</a>
@@ -134,31 +144,37 @@
                         </div>
 
                         {{-- Gestión de Áreas Comunes --}}
-                    <a  class="nav-link {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? '' : 'collapsed' }}"
-                        href="#" data-bs-toggle="collapse" data-bs-target="#collapseAreas"
-                        aria-expanded="{{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'true' : 'false' }}"
-                        aria-controls="collapseAreas">
-                        <div class="sb-nav-link-icon"><i class="fas fa-swimming-pool"></i></div>
-                        Gestión de Áreas Comunes
-                        <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
-                    </a>
+                        <a class="nav-link {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? '' : 'collapsed' }}"
+                            href="#" data-bs-toggle="collapse" data-bs-target="#collapseAreas"
+                            aria-expanded="{{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'true' : 'false' }}"
+                            aria-controls="collapseAreas">
+                            <div class="sb-nav-link-icon"><i class="fas fa-swimming-pool"></i></div>
+                            Gestión de Áreas Comunes
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'show' : '' }}"
+                            id="collapseAreas" data-bs-parent="#collapseFinanzas">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                {{-- Catálogo de Áreas --}}
+                                <a class="nav-link {{ request()->routeIs('areas-comunes.index') ? 'active' : '' }}"
+                                    href="{{ route('areas-comunes.index') }}">Catálogo
+                                </a>
+                                {{-- Reservas --}}
+                                <a class="nav-link {{ request()->routeIs('reservas.index') ? 'active' : '' }}"
+                                    href="{{ route('reservas.index') }}">Reservas
+                                </a>
+                            </nav>
+                        </div>
+                        {{-- Multas --}}
+                        <a class="nav-link" href="{{route('multas.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-gavel"></i></div>
+                            Panel de Multas
+                        </a>
 
-                    <div  class="collapse {{ request()->routeIs('areas-comunes.*') || request()->routeIs('reservas.*') ? 'show' : '' }}"
-                        id="collapseAreas" data-bs-parent="#collapseFinanzas">
-                        <nav class="sb-sidenav-menu-nested nav">
-                            {{-- Catálogo de Áreas --}}
-                            <a  class="nav-link {{ request()->routeIs('areas-comunes.index') ? 'active' : '' }}"
-                                href="{{ route('areas-comunes.index') }}">Catálogo
-                            </a>
-                            {{-- Reservas --}}
-                            <a  class="nav-link {{ request()->routeIs('reservas.index') ? 'active' : '' }}"
-                                href="{{ route('reservas.index') }}">Reservas
-                            </a>
-                        </nav>
-                    </div>
-
-                        {{-- Otras secciones visibles sin permisos aún --}}
-                        <a class="nav-link" href="#">Multas y sanciones</a>
+                        <a class="nav-link {{ request()->routeIs('inventario.*') ? 'active' : '' }}" href="{{ route('inventario.index') }}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-boxes"></i></div>
+                            Inventario
+                        </a>
                     </nav>
                 </div>
 
@@ -172,9 +188,12 @@
                 <div class="collapse" id="collapseComunicacion" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
                         <a class="nav-link" href="#">Calificaciones de Servicios</a>
-                        <a class="nav-link" href="#">Comunicados y Noticias</a>
+                        <a class="nav-link" href="{{ route('comunicados.index') }}">Comunicados y Noticias</a>
                         <a class="nav-link" href="#">Reclamos y Sugerencias</a>
-                        <a class="nav-link" href="#">Notificaciones</a>
+                        {{-- Reclamos y Sugerencias --}}
+                        <a class="nav-link" href="{{route('reclamos.index')}}">
+                            <div class="sb-nav-link-icon"><i class="fas fa-paper-plane"></i></div>
+                            Reclamos y Sugerencias</a>
                     </nav>
                 </div>
 
@@ -319,8 +338,6 @@
                         <a class="nav-link" href="#">Foro Vecinal</a>
                     </nav>
                 </div>
-
-
 
 
                 {{-- Bitácora --}}

@@ -1,13 +1,15 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Models\VerificacionInventario;
 use App\Models\AreaComun;
 use App\Models\Reserva;
 use Illuminate\Http\Request;
 use App\Traits\BitacoraTrait;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use App\Models\Notificacion;
+
 
 class ReservaController extends Controller
 {
@@ -15,13 +17,27 @@ class ReservaController extends Controller
 
     public function index()
     {
-        $reservas = Reserva::with(['areaComun', 'residente'])->paginate(10);
+        $user = Auth::user();
+
+        if ($user->residente_id) {
+            // Residente ve sólo sus reservas
+            $reservas = Reserva::where('residente_id', $user->residente_id)
+                            ->orderBy('fecha', 'Desc')->get();
+        } elseif ($user->empleado_id) {
+            // Empleado ve sólo las reservas que él registró
+            $reservas = Reserva::where('empleado_id', $user->empleado_id)
+                            ->orderBy('fecha', 'Desc')->get();
+        } else {
+            // Administrador ve todas
+            $reservas = Reserva::orderBy('id', 'Desc')->get();
+        }
+
         return view('reservas.index', compact('reservas'));
     }
 
     public function create()
     {
-        $areasComunes = AreaComun::all();
+        $areasComunes = AreaComun::where('estado', 'activo')->get();
         return view('reservas.create', compact('areasComunes'));
     }
 
@@ -36,17 +52,15 @@ class ReservaController extends Controller
             'monto_total' => 'nullable|numeric|min:0',
         ]);
 
-        // Convertir horas a Carbon para validación precisa
         $horaInicio = Carbon::createFromFormat('H:i', $request->hora_inicio);
         $horaFin = Carbon::createFromFormat('H:i', $request->hora_fin);
 
-        // Validar solapamiento
         $conflict = Reserva::where('area_comun_id', $request->area_comun_id)
             ->where('fecha', $request->fecha)
-            ->where(function($query) use ($horaInicio, $horaFin) {
-                $query->where(function($q) use ($horaInicio, $horaFin) {
+            ->where(function ($query) use ($horaInicio, $horaFin) {
+                $query->where(function ($q) use ($horaInicio, $horaFin) {
                     $q->where('hora_inicio', '<', $horaFin->format('H:i:s'))
-                      ->where('hora_fin', '>', $horaInicio->format('H:i:s'));
+                        ->where('hora_fin', '>', $horaInicio->format('H:i:s'));
                 });
             })->exists();
 
@@ -54,16 +68,10 @@ class ReservaController extends Controller
             return back()->withErrors(['La reserva seleccionada se solapa con otra ya existente.'])->withInput();
         }
 
-        // Obtener el área común para sacar el precio por hora
         $areaComun = AreaComun::findOrFail($request->area_comun_id);
-
-        // Calcular duración en horas
         $duracionHoras = $horaFin->diffInMinutes($horaInicio) / 60;
-
-        // Calcular monto total
         $montoTotal = $duracionHoras * $areaComun->monto;
 
-        // Obtener usuario autenticado
         $user = Auth::user();
 
         if (!$user) {
@@ -77,7 +85,7 @@ class ReservaController extends Controller
         }
 
         // Crear reserva
-        Reserva::create([
+        $reserva = Reserva::create([
             'area_comun_id' => $request->area_comun_id,
             'fecha' => $request->fecha,
             'hora_inicio' => $request->hora_inicio,
@@ -88,11 +96,28 @@ class ReservaController extends Controller
             'monto_total' => $montoTotal,
         ]);
 
+        // Determinar nombre del usuario afectado
+        $nombreUsuario = $reserva->residente
+            ? $reserva->residente->nombre_completo
+            : ($reserva->empleado->nombre_completo ?? 'N/D');
+
+        $this->registrarEnBitacora( "Usuario {$nombreUsuario} Creo una reserva ID: {$reserva->id}", $reserva->id);
+
         // Registrar en bitácora
-        $this->registrarEnBitacora('Residente Agendo un Area Comun', $request->area_comun_id);
+        $this->registrarEnBitacora('Residente agendó un área común', $request->area_comun_id);
+
+        // Crear notificación solo para el residente que hizo la reserva
+        Notificacion::create([
+            'titulo' => 'Reserva registrada',
+            'contenido' => 'Has registrado una reserva para el área "' . $areaComun->nombre . '" el día ' . $request->fecha . ' de ' . $request->hora_inicio . ' a ' . $request->hora_fin . '.',
+            'tipo' => 'Informativa',
+            'fecha_hora' => now(),
+            'residente_id' => $user->residente_id,
+            'ruta'=> route('reservas.index'),
+        ]);
 
         return redirect()->route('reservas.index')->with('success', 'Reserva creada correctamente.');
-    }
+}
 
     public function show(Reserva $reserva)
     {
@@ -101,7 +126,7 @@ class ReservaController extends Controller
 
     public function edit(Reserva $reserva)
     {
-        $areasComunes = AreaComun::all();
+        $areasComunes = AreaComun::where('estado', 'activo')->get();
         return view('reservas.edit', compact('reserva', 'areasComunes'));
     }
 
@@ -159,7 +184,12 @@ class ReservaController extends Controller
             'monto_total' => $montoTotal,
         ]);
 
-        $this->registrarEnBitacora('Reserva actualizada ID: ' . $reserva->id);
+        // Determinar nombre del usuario afectado
+        $nombreUsuario = $reserva->residente
+            ? $reserva->residente->nombre_completo
+            : ($reserva->empleado->nombre_completo ?? 'N/D');
+
+        $this->registrarEnBitacora( "Usuario {$nombreUsuario} Actualizo la reserva ID: {$reserva->id}", $reserva->id);
 
         return redirect()->route('reservas.index')->with('success', 'Reserva actualizada correctamente.');
     }
@@ -167,9 +197,15 @@ class ReservaController extends Controller
     public function destroy(Reserva $reserva)
     {
         try {
+
+            // Determinar nombre del usuario afectado
+            $nombreUsuario = $reserva->residente
+                ? $reserva->residente->nombre_completo
+                : ($reserva->empleado->nombre_completo ?? 'N/D');
+
             $reserva->delete();
 
-            $this->registrarEnBitacora('Reserva eliminada ID: ' . $reserva->id);
+            $this->registrarEnBitacora( "Usuario {$nombreUsuario} Borro su reserva ID: {$reserva->id}", $reserva->id);
 
             return redirect()->route('reservas.index')
                             ->with('success', 'Reserva eliminada correctamente.');
@@ -217,4 +253,37 @@ class ReservaController extends Controller
 
         return response()->json($horasPosiblesStrings);
     }
+
+
+
+public function verificarInventario($reserva_id)
+{
+    $reserva = Reserva::with('areaComun.inventarios')->findOrFail($reserva_id);
+    return view('reservas.verificar_inventario', compact('reserva'));
+}
+
+public function guardarVerificacion(Request $request, $reserva_id)
+{
+    $request->validate([
+        'verificaciones' => 'required|array',
+        'verificaciones.*.estado' => 'required|in:ok,faltante,roto,otro',
+        'verificaciones.*.observacion' => 'nullable|string|max:255',
+    ]);
+
+    foreach ($request->verificaciones as $inventario_id => $verificacion) {
+        VerificacionInventario::updateOrCreate(
+            [
+                'reserva_id' => $reserva_id,
+                'inventario_id' => $inventario_id,
+            ],
+            [
+                'estado' => $verificacion['estado'],
+                'observacion' => $verificacion['observacion'] ?? null,
+            ]
+        );
+    }
+
+    return redirect()->route('reservas.index')->with('success', 'Verificación guardada correctamente.');
+}
+
 }

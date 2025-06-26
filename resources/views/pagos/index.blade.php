@@ -60,7 +60,6 @@
             </ul>
         </div>
     </div>
-    <a href="{{ route('pagos.create') }}" class="btn btn-primary mb-3">Emitir pago</a>
 
     @if(session('success'))
     <div class="alert alert-success">{{ session('success') }}</div>

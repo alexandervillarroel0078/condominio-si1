@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use PhpParser\Node\Stmt\TryCatch;
 use Spatie\Permission\Models\Role;
 use App\Traits\BitacoraTrait;
+use App\Models\Residente;
 
 class UsuarioController extends Controller
 {
@@ -27,15 +28,20 @@ class UsuarioController extends Controller
         return view('users.index', compact('users'));
     }
 
+    public function miPerfil()
+    {
+        $user = auth()->user();
+        return view('users.perfil', compact('user'));
+    }
 
- public function create()
-{
-    $roles = Role::all();
-    $empleados = Empleado::all();
-    $residentes = \App\Models\Residente::all();
+    public function create()
+    {
+        $roles = Role::all();
+        $empleados = Empleado::all();
+        $residentes = \App\Models\Residente::all();
 
-    return view('users.create', compact('roles', 'empleados', 'residentes'));
-}
+        return view('users.create', compact('roles', 'empleados', 'residentes'));
+    }
 
 
     public function store(StoreUsuarioRequest $request)
@@ -81,47 +87,49 @@ class UsuarioController extends Controller
     }
 
 
- public function edit(User $user)
-{
-    $empleados = \App\Models\Empleado::all();
-    $roles = Role::all();
-    return view('users.edit', compact('user', 'roles', 'empleados'));
-}
-
-
-
-public function update(updateUsuarioRequest $request, User $user)
-{
-    try {
-        DB::beginTransaction();
-
-        if ($request->filled('empleado_id') && $request->filled('residente_id')) {
-            return back()->withErrors(['No se puede asignar un empleado y un residente al mismo tiempo.'])->withInput();
-        }
-
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-            'empleado_id' => $request->empleado_id,
-            'residente_id' => $request->residente_id,
-        ]);
-
-        if ($request->filled('password')) {
-            $user->password = Hash::make($request->password);
-            $user->save(); // necesario si editamos password luego del update()
-        }
-
-        $user->syncRoles([$request->role]);
-        $this->registrarEnBitacora('Usuario actualizado', $user->id);
-        DB::commit();
-
-        return redirect()->route('users.index')->with('success', 'El usuario se ha actualizado');
-    } catch (Exception $e) {
-        DB::rollBack();
-        $this->registrarEnBitacora('Error al actualizar usuario: ' . $e->getMessage());
-        return back()->withErrors(['error' => 'Ocurrió un error al actualizar el usuario.'])->withInput();
+    public function edit(User $user)
+    {
+        $roles = Role::all();
+        $empleados = Empleado::all();
+        $residentes = Residente::all();
+        return view('users.edit', compact('user', 'roles', 'empleados', 'residentes'));
     }
-}
+
+
+
+
+    public function update(updateUsuarioRequest $request, User $user)
+    {
+        try {
+            DB::beginTransaction();
+
+            if ($request->filled('empleado_id') && $request->filled('residente_id')) {
+                return back()->withErrors(['No se puede asignar un empleado y un residente al mismo tiempo.'])->withInput();
+            }
+
+            $user->update([
+                'name' => $request->name,
+                'email' => $request->email,
+                'empleado_id' => $request->empleado_id,
+                'residente_id' => $request->residente_id,
+            ]);
+
+            if ($request->filled('password')) {
+                $user->password = Hash::make($request->password);
+                $user->save(); // necesario si editamos password luego del update()
+            }
+
+            $user->syncRoles([$request->role]);
+            $this->registrarEnBitacora('Usuario actualizado', $user->id);
+            DB::commit();
+
+            return redirect()->route('users.index')->with('success', 'El usuario se ha actualizado');
+        } catch (Exception $e) {
+            DB::rollBack();
+            $this->registrarEnBitacora('Error al actualizar usuario: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Ocurrió un error al actualizar el usuario.'])->withInput();
+        }
+    }
 
 
 

@@ -12,11 +12,14 @@ class NotificacionController extends Controller
     {
         $query = Notificacion::with('residente');
 
-        // Filtro por residente si el usuario tiene uno asignado
         $user = Auth::user();
-        if ($user && $user->residente_id) {
-            $query->where('residente_id', $user->residente_id);
-        }
+        $residenteId = $user->residente_id;
+
+        // Mostrar notificaciones globales o dirigidas al residente actual
+        $query->where(function ($q) use ($residenteId) {
+            $q->whereNull('residente_id')
+              ->orWhere('residente_id', $residenteId);
+        });
 
         // Filtro por búsqueda
         if ($request->filled('search')) {
@@ -37,5 +40,33 @@ class NotificacionController extends Controller
                                 ->appends($request->all());
 
         return view('notificaciones.index', compact('notificaciones'));
+    }
+
+    public function marcarLeida($id)
+    {
+        $notificacion = Notificacion::findOrFail($id);
+        $residenteId = Auth::user()->residente_id;
+
+        if (is_null($notificacion->residente_id) || $notificacion->residente_id == $residenteId) {
+            $notificacion->update(['leida' => true]);
+        }
+
+        return redirect()->back()->with('success', 'Notificación marcada como leída.');
+    }
+
+    public function ver($id)
+    {
+        $notificacion = Notificacion::findOrFail($id);
+        $residenteId = Auth::user()->residente_id;
+
+        if (is_null($notificacion->residente_id) || $notificacion->residente_id == $residenteId) {
+            $notificacion->update(['leida' => true]);
+
+            if ($notificacion->ruta) {
+                return redirect($notificacion->ruta);
+            }
+        }
+
+        return redirect()->route('notificaciones.index');
     }
 }

@@ -26,6 +26,7 @@ use App\Http\Controllers\UnidadController;
 use App\Http\Controllers\MultaController;
 use App\Http\Controllers\VisitaController;
 use App\Http\Controllers\NotificacionController;
+use App\Http\Controllers\ComunicadoController;
 use App\Http\Controllers\InventarioController;
 use App\Http\Controllers\ReclamoController;
 
@@ -204,17 +205,10 @@ Route::resource('notificaciones', NotificacionController::class)->parameters([
     'notificaciones' => 'notificacion',
 ]);
 
+Route::resource('comunicados', ComunicadoController::class);
 
-
-
-
-
-
-
-
-
-
-
+Route::post('/notificaciones/{id}/leer', [NotificacionController::class, 'marcarLeida'])->name('notificaciones.marcarLeida');
+Route::post('/notificaciones/{id}/ver', [NotificacionController::class, 'ver'])->name('notificaciones.ver');
 
 
 

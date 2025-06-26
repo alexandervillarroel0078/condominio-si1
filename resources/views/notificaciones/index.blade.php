@@ -21,20 +21,38 @@
                 <th><a href="{{ route('notificaciones.index', array_merge(request()->all(), ['sort' => 'tipo', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-white text-decoration-none">Tipo</a></th>
                 <th><a href="{{ route('notificaciones.index', array_merge(request()->all(), ['sort' => 'fecha_hora', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-white text-decoration-none">Fecha y Hora</a></th>
                 <th><a href="{{ route('notificaciones.index', array_merge(request()->all(), ['sort' => 'residente_id', 'direction' => request('direction') === 'asc' ? 'desc' : 'asc'])) }}" class="text-white text-decoration-none">Residente</a></th>
+                <th>Acciones</th>
             </tr>
         </thead>
         <tbody>
             @forelse($notificaciones as $n)
-            <tr>
+            <tr @if(!$n->leida) class="fw-bold" @endif>
                 <td>{{ $n->titulo }}</td>
                 <td>{{ $n->contenido }}</td>
                 <td>{{ $n->tipo }}</td>
-                <td>{{ $n->fecha_hora }}</td>
+                <td>{{ \Carbon\Carbon::parse($n->fecha_hora)->format('d/m/Y H:i') }}</td>
                 <td>{{ $n->residente->nombre ?? '-' }}</td>
+                <td>
+                    <div class="d-flex gap-2">
+                        {{-- Botón VER --}}
+                        <form action="{{ route('notificaciones.ver', $n->id) }}" method="POST">
+                            @csrf
+                            <button class="btn btn-sm btn-info" title="Ver y redirigir">Ver</button>
+                        </form>
+
+                        {{-- Botón Marcar como leída --}}
+                        @if(!$n->leida)
+                        <form action="{{ route('notificaciones.marcarLeida', $n->id) }}" method="POST">
+                            @csrf
+                            <button class="btn btn-sm btn-secondary" title="Marcar como leída">Leído</button>
+                        </form>
+                        @endif
+                    </div>
+                </td>
             </tr>
             @empty
             <tr>
-                <td colspan="5" class="text-center">No se encontraron notificaciones.</td>
+                <td colspan="6" class="text-center">No se encontraron notificaciones.</td>
             </tr>
             @endforelse
         </tbody>

@@ -228,7 +228,8 @@
                         <ul class="list-group">
                             <a href="#" class="list-group-item list-group-item-action">Calificaciones de
                                 Servicios</a>
-                            <a href="#" class="list-group-item list-group-item-action">Comunicados y
+                            <a href="{{ route('comunicados.index') }}" 
+                                class="list-group-item list-group-item-action">Comunicados y
                                 Noticias</a>
                             <a href="#" class="list-group-item list-group-item-action">Reclamos y
                                 Sugerencias</a>

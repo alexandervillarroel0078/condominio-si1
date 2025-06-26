@@ -113,6 +113,7 @@ class ReservaController extends Controller
             'tipo' => 'Informativa',
             'fecha_hora' => now(),
             'residente_id' => $user->residente_id,
+            'ruta'=> route('reservas.index'),
         ]);
 
         return redirect()->route('reservas.index')->with('success', 'Reserva creada correctamente.');

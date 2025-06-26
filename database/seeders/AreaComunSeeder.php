@@ -17,12 +17,12 @@ class AreaComunSeeder extends Seeder
             [
                 'nombre' => 'Salón de Eventos',
                 'monto'  => 250.00,        // tarifa por reserva
-                'estado' => 'libre',
+                'estado' => 'activo',
             ],
             [
                 'nombre' => 'Piscina',
                 'monto'  => 150.00,
-                'estado' => 'libre',
+                'estado' => 'activo',
             ],
         ];
 

@@ -52,7 +52,9 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('areas-comunes', AreaComunController::class)->parameters([
         'areas-comunes' => 'areaComun'
     ]);
-    Route::resource('reservas', ReservaController::class);
+    Route::resource('reservas', ReservaController::class)->parameters([
+        'reservas' => 'reserva'
+    ]);
 });
 Route::get('/api/horas-libres', [ReservaController::class, 'horasLibres']);
 
@@ -100,6 +102,14 @@ Route::get('/pagos/create/cuota/{cuota}', [PagoController::class, 'createCuota']
 Route::get('/pagos/create/multa/{multa}', [PagoController::class, 'createMulta'])
     ->name('pagos.create.multa')
     ->middleware('auth');
+Route::post('/pagos/qr-multa', [PagoController::class, 'pagoQRMulta'])
+     ->name('pagos.qr.multa')
+     ->middleware('auth');
+Route::post('/pagos/stripe/multa', [PagoController::class, 'pagoStripeMulta'])
+     ->name('pagos.stripe.multa')
+     ->middleware('auth');
+Route::get('/stripe/success/multa/{multa}', [PagoController::class, 'stripeSuccessMulta'])
+     ->name('pagos.stripe.success.multa');
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('pagos', PagoController::class)->only(['index',  'store']);

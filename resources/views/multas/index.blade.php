@@ -82,6 +82,11 @@
                                     Pagar
                                 </a>
                                 @endif
+                                @if(auth()->check() && (auth()->user()->residente_id || auth()->user()->empleado_id) && $multa->estado == 'pagada' && $multa->pagos->isNotEmpty())
+                                    <a href="{{ route('pagos.comprobante', $multa->pagos->first()->id) }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                        Ver Comprobante
+                                    </a>
+                                @endif
 
                                 {{-- Solo administradores pueden editar/anular --}}
                                 @if(auth()->check() && !auth()->user()->residente_id && !auth()->user()->empleado_id)

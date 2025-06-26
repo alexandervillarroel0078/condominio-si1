@@ -17,13 +17,27 @@ class ReservaController extends Controller
 
     public function index()
     {
-        $reservas = Reserva::with(['areaComun', 'residente'])->paginate(10);
+        $user = Auth::user();
+
+        if ($user->residente_id) {
+            // Residente ve sólo sus reservas
+            $reservas = Reserva::where('residente_id', $user->residente_id)
+                            ->orderBy('fecha', 'Desc')->get();
+        } elseif ($user->empleado_id) {
+            // Empleado ve sólo las reservas que él registró
+            $reservas = Reserva::where('empleado_id', $user->empleado_id)
+                            ->orderBy('fecha', 'Desc')->get();
+        } else {
+            // Administrador ve todas
+            $reservas = Reserva::orderBy('id', 'Desc')->get();
+        }
+
         return view('reservas.index', compact('reservas'));
     }
 
     public function create()
     {
-        $areasComunes = AreaComun::all();
+        $areasComunes = AreaComun::where('estado', 'activo')->get();
         return view('reservas.create', compact('areasComunes'));
     }
 
@@ -82,6 +96,13 @@ class ReservaController extends Controller
             'monto_total' => $montoTotal,
         ]);
 
+        // Determinar nombre del usuario afectado
+        $nombreUsuario = $reserva->residente
+            ? $reserva->residente->nombre_completo
+            : ($reserva->empleado->nombre_completo ?? 'N/D');
+
+        $this->registrarEnBitacora( "Usuario {$nombreUsuario} Creo una reserva ID: {$reserva->id}", $reserva->id);
+
         // Registrar en bitácora
         $this->registrarEnBitacora('Residente agendó un área común', $request->area_comun_id);
 
@@ -104,7 +125,7 @@ class ReservaController extends Controller
 
     public function edit(Reserva $reserva)
     {
-        $areasComunes = AreaComun::all();
+        $areasComunes = AreaComun::where('estado', 'activo')->get();
         return view('reservas.edit', compact('reserva', 'areasComunes'));
     }
 
@@ -162,7 +183,12 @@ class ReservaController extends Controller
             'monto_total' => $montoTotal,
         ]);
 
-        $this->registrarEnBitacora('Reserva actualizada ID: ' . $reserva->id);
+        // Determinar nombre del usuario afectado
+        $nombreUsuario = $reserva->residente
+            ? $reserva->residente->nombre_completo
+            : ($reserva->empleado->nombre_completo ?? 'N/D');
+
+        $this->registrarEnBitacora( "Usuario {$nombreUsuario} Actualizo la reserva ID: {$reserva->id}", $reserva->id);
 
         return redirect()->route('reservas.index')->with('success', 'Reserva actualizada correctamente.');
     }
@@ -170,9 +196,15 @@ class ReservaController extends Controller
     public function destroy(Reserva $reserva)
     {
         try {
+
+            // Determinar nombre del usuario afectado
+            $nombreUsuario = $reserva->residente
+                ? $reserva->residente->nombre_completo
+                : ($reserva->empleado->nombre_completo ?? 'N/D');
+
             $reserva->delete();
 
-            $this->registrarEnBitacora('Reserva eliminada ID: ' . $reserva->id);
+            $this->registrarEnBitacora( "Usuario {$nombreUsuario} Borro su reserva ID: {$reserva->id}", $reserva->id);
 
             return redirect()->route('reservas.index')
                             ->with('success', 'Reserva eliminada correctamente.');

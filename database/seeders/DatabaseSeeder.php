@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
             MultaSeeder::class,
             CategoriaInventarioSeeder::class,
             InventarioSeeder::class,
+            ComunicadoSeeder::class,
         ]);
     }
 }

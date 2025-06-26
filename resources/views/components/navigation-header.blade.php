@@ -16,8 +16,33 @@
         </div>
     </form>
 
+    @php
+        $usuario = Auth::user();
+        $residenteId = $usuario->residente_id ?? null;
+        $notificacionesNoLeidas = \App\Models\Notificacion::where('leida', false)
+            ->where(function ($query) use ($residenteId) {
+                $query->whereNull('residente_id')
+                    ->orWhere('residente_id', $residenteId);
+            })->count();
+    @endphp
+
+
      
-    <ul class="navbar-nav ms-auto ms-md-0 me-3 me-lg-4">
+    <ul class="navbar-nav ms-auto me-3 me-lg-4 align-items-center">
+        {{-- Notificación --}}
+        <li class="nav-item position-relative me-3">
+            <a class="nav-link" href="{{ route('notificaciones.index') }}" title="Notificaciones">
+                <i class="fas fa-bell fa-lg"></i>
+                @if($notificacionesNoLeidas > 0)
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                        {{ $notificacionesNoLeidas }}
+                        <span class="visually-hidden">notificaciones no leídas</span>
+                    </span>
+                @endif
+            </a>
+        </li>
+
+        {{-- Perfil --}}
         <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" id="navbarDropdown" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
                 <i class="fas fa-user fa-fw"></i>
@@ -31,4 +56,5 @@
             </ul>
         </li>
     </ul>
+
 </nav>

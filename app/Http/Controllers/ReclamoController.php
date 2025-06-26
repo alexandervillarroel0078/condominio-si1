@@ -6,6 +6,7 @@ use App\Models\Reclamo;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use App\Models\Notificacion;
 use App\Traits\BitacoraTrait;
 
 class ReclamoController extends Controller
@@ -79,6 +80,16 @@ class ReclamoController extends Controller
             : ($reclamo->empleado->nombre_completo ?? 'N/D');
 
         $this->registrarEnBitacora( "Usuario {$nombreUsuario} Solicito un reclamo/sugerencia ID:{$reclamo->id}", $reclamo->id);
+
+        // Crear notificación solo para el residente que hizo la reserva
+        Notificacion::create([
+            'titulo' => 'Nuevo Reclamo',
+            'contenido' => 'Un nuevo reclamo ha sido creado por: "' . $user->name . '" el día ' . $request->fecha .'.',
+            'tipo' => 'Informativa',
+            'fecha_hora' => now(),
+            'residente_id' => null,
+            'ruta'=> route('reclamos.index'),
+        ]);
 
         return redirect()
             ->route('reclamos.index')

@@ -31,5 +31,8 @@ class Reserva extends Model
     {
         return $this->belongsTo(Residente::class, 'residente_id');
     }
-
+    public function verificaciones()
+    {
+        return $this->hasMany(VerificacionInventario::class);
+    }
 }

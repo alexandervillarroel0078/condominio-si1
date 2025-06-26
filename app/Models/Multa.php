@@ -34,4 +34,8 @@ class Multa extends Model
     {
         return $this->belongsTo(Cuota::class);
     }
+    public function pagos()
+    {
+        return $this->hasMany(Pago::class, 'multa_id');
+    }
 }

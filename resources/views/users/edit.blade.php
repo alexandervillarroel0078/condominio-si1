@@ -40,13 +40,19 @@
             </div>
 
             <div class="form-group mb-2">
-                <label for="inputPassword">Contraseña</label>
-                <input type="password" class="form-control" name="password" id="inputPassword"
-                    placeholder="Ingrese nueva contraseña">
-                @error('password')
-                <small class="text-danger"> {{ '*' . $message }} </small>
-                @enderror
+                <label for="password">Nueva contraseña</label>
+                <input type="password" class="form-control" name="password" placeholder="Nueva contraseña">
             </div>
+
+            <div class="form-group mb-2">
+                <label for="password_confirmation">Confirmar contraseña</label>
+                <input type="password" class="form-control" name="password_confirmation" placeholder="Confirmar contraseña">
+            </div>
+
+            @error('password')
+            <small class="text-danger">*{{ $message }}</small>
+            @enderror
+
             <div class="form-group mb-2">
                 <label for="empleado_id">Empleado</label>
                 <select class="form-select" id="empleado_id" name="empleado_id" data-placeholder="Seleccione empleado">

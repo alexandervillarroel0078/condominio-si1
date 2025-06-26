@@ -3,21 +3,21 @@
 @section('title', 'Panel de Multas')
 
 @push('css')
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 @endpush
 
 @section('content')
 @if (session('success'))
-    <script>
-        Swal.fire({
-            toast: true,
-            position: "top-end",
-            icon: "success",
-            title: "{{ session('success') }}",
-            showConfirmButton: false,
-            timer: 1500
-        });
-    </script>
+<script>
+    Swal.fire({
+        toast: true,
+        position: "top-end",
+        icon: "success",
+        title: "{{ session('success') }}",
+        showConfirmButton: false,
+        timer: 1500
+    });
+</script>
 @endif
 
 <div class="container-fluid px-4">
@@ -77,24 +77,24 @@
                             <div class="btn-group" role="group">
                                 {{-- Botón “Pagar” para residentes y empleados --}}
                                 @if(auth()->check() && (auth()->user()->residente_id || auth()->user()->empleado_id) && $multa->estado == 'pendiente')
-                                    <a href="{{ route('pagos.create', ['multa_id' => $multa->id]) }}"
-                                       class="btn btn-success btn-sm me-1">
-                                       Pagar
-                                    </a>
+                                <a href="{{ route('pagos.create.multa', ['multa' => $multa->id]) }}"
+                                    class="btn btn-success btn-sm me-1">
+                                    Pagar
+                                </a>
                                 @endif
 
                                 {{-- Solo administradores pueden editar/anular --}}
                                 @if(auth()->check() && !auth()->user()->residente_id && !auth()->user()->empleado_id)
-                                    <a href="{{ route('multas.edit', $multa->id) }}" class="btn btn-warning btn-sm me-1">Editar</a>
-                                    <!-- Botón Anular -->
-                                    <form action="{{ route('multas.destroy', $multa->id) }}" method="POST" style="display:inline;">
-                                        @csrf
-                                        @method('DELETE')
-                                        <button class="btn btn-danger btn-sm"
-                                                onclick="return confirm('¿Eliminar esta multa?')">
-                                            Eliminar
-                                        </button>
-                                    </form>
+                                <a href="{{ route('multas.edit', $multa->id) }}" class="btn btn-warning btn-sm me-1">Editar</a>
+                                <!-- Botón Anular -->
+                                <form action="{{ route('multas.destroy', $multa->id) }}" method="POST" style="display:inline;">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button class="btn btn-danger btn-sm"
+                                        onclick="return confirm('¿Eliminar esta multa?')">
+                                        Eliminar
+                                    </button>
+                                </form>
                                 @endif
                             </div>
                         </td>

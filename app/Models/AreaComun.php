@@ -20,4 +20,9 @@ class AreaComun extends Model
     {
         return $this->hasMany(Reserva::class, 'area_comun_id');
     }
+    public function inventarios()
+{
+    return $this->hasMany(Inventario::class);
+}
+
 }

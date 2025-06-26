@@ -25,11 +25,11 @@ class updateUsuarioRequest extends FormRequest
         $userId = $user->id;
         return [
             'name' => 'required|min:3|max:50',
-            'email' => 'required|email|max:250|unique:users,email,'.$userId,
-            'password' => 'required|min:3|max:20',
-            'empleado_id' => 'required|integer|exists:empleados,id',
+            'email' => 'required|email|max:250|unique:users,email,' . $userId,
+            'password' => 'nullable|string|min:6|confirmed',
+            'empleado_id' => 'nullable|integer|exists:empleados,id',
+            'residente_id' => 'nullable|integer|exists:residentes,id',
             'role' => 'required|exists:roles,name'
-            
         ];
         // añadir luego:
         // 'password' => 'required|min:3|max:20'

@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             EmpleadosSeeder::class,
             ResidentesSeeder::class,
             VisitasSeeder::class,
+            RegistroSeguridadSeeder::class,
             UnidadSeeder::class,
             PagoSeeder::class,
             TipoCuotaSeeder::class,

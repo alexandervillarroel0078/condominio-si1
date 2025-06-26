@@ -175,7 +175,6 @@
                             <div class="sb-nav-link-icon"><i class="fas fa-boxes"></i></div>
                             Inventario
                         </a>
-
                     </nav>
                 </div>
 
@@ -208,24 +207,116 @@
                 </a>
                 <div class="collapse" id="collapseSeguridad" data-bs-parent="#sidenavAccordion">
                     <nav class="sb-sidenav-menu-nested nav">
-                        <a class="nav-link" href="#">Control de Acceso</a>
-
-                        {{--Solo para usuarios con permiso 'gestionar visitas' --}}
-                        @can('gestionar visitas')
-                        <a class="nav-link" href="{{ route('visitas.index') }}">Visitas</a>
-                        @endcan
-
-                        {{--Solo para usuarios con permiso 'operar porteria' --}}
-                        @can('operar porteria')
-                        <a class="nav-link" href="{{ route('visitas.panel-guardia') }}">Panel Guardia</a>
-                        @endcan
-
-                        {{-- Solo para usuarios con permiso 'administrar visitas' --}}
-                        @can('administrar visitas')
-                        <a class="nav-link" href="{{ route('visitas.mostrar-validar-codigo') }}">Validar Código Visita</a>
-                        @endcan
-
-                        <a class="nav-link" href="#">Seguridad y Vigilancia</a>
+                        
+                        {{-- CONTROL DE ACCESO Y VISITAS --}}
+                        <a class="nav-link {{ request()->routeIs('visitas.*') ? '' : 'collapsed' }}" 
+                        href="#" data-bs-toggle="collapse" data-bs-target="#collapseVisitas"
+                        aria-expanded="{{ request()->routeIs('visitas.*') ? 'true' : 'false' }}" 
+                        aria-controls="collapseVisitas">
+                            <div class="sb-nav-link-icon"><i class="fas fa-users"></i></div>
+                            Control de Acceso y Visitas
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse {{ request()->routeIs('visitas.*') ? 'show' : '' }}" 
+                            id="collapseVisitas">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                <a class="nav-link" href="#">Control de Acceso</a>
+                                
+                                {{-- Solo para usuarios con permiso 'gestionar visitas' --}}
+                                @can('gestionar visitas')
+                                <a class="nav-link {{ request()->routeIs('visitas.index') ? 'active' : '' }}" 
+                                href="{{ route('visitas.index') }}">
+                                     Gestionar Visitas
+                                </a>
+                                @endcan
+                                
+                                {{-- Solo para usuarios con permiso 'operar porteria' --}}
+                                @can('operar porteria')
+                                <a class="nav-link {{ request()->routeIs('visitas.panel-guardia') ? 'active' : '' }}" 
+                                href="{{ route('visitas.panel-guardia') }}">
+                                    Panel Guardia
+                                </a>
+                                @endcan
+                                
+                                {{-- Solo para usuarios con permiso 'administrar visitas' --}}
+                                @can('administrar visitas')
+                                <a class="nav-link {{ request()->routeIs('visitas.mostrar-validar-codigo') ? 'active' : '' }}" 
+                                href="{{ route('visitas.mostrar-validar-codigo') }}">
+                                    Validar Código Visita
+                                </a>
+                                @endcan
+                            </nav>
+                        </div>
+                        
+                        {{-- SEGURIDAD Y VIGILANCIA --}}
+                        <a class="nav-link {{ request()->routeIs('seguridad.*') ? '' : 'collapsed' }}" 
+                        href="#" data-bs-toggle="collapse" data-bs-target="#collapseVigilancia"
+                        aria-expanded="{{ request()->routeIs('seguridad.*') ? 'true' : 'false' }}" 
+                        aria-controls="collapseVigilancia">
+                            <div class="sb-nav-link-icon"><i class="fas fa-eye"></i></div>
+                            Seguridad y Vigilancia
+                            <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                        </a>
+                        <div class="collapse {{ request()->routeIs('seguridad.*') ? 'show' : '' }}" 
+                            id="collapseVigilancia">
+                            <nav class="sb-sidenav-menu-nested nav">
+                                
+                                {{-- ADMINISTRADOR - Ve todo --}}
+                                @can('administrar-seguridad')
+                                <a class="nav-link {{ request()->routeIs('seguridad.index') && !request('estado') ? 'active' : '' }}" 
+                                href="{{ route('seguridad.index') }}">
+                                    Administrar Seguridad
+                                </a>
+                                @endcan
+                                
+                                {{-- DIRECTIVA - Solo lectura --}}
+                                @can('ver-registros-seguridad')
+                                    @cannot('administrar-seguridad')
+                                    <a class="nav-link {{ request()->routeIs('seguridad.index') ? 'active' : '' }}" 
+                                    href="{{ route('seguridad.index') }}">
+                                        Registros de Seguridad
+                                    </a>
+                                    @endcannot
+                                @endcan
+                                
+                                {{-- PERSONAL DE SEGURIDAD - Panel completo --}}
+                                @can('crear-registro-seguridad')
+                                    @cannot('administrar-seguridad')
+                                    <a class="nav-link {{ request()->routeIs('seguridad.index') && !request('estado') ? 'active' : '' }}" 
+                                    href="{{ route('seguridad.index') }}">
+                                         Panel de Seguridad
+                                    </a>
+                                    @endcannot
+                                    
+                                    <a class="nav-link {{ request()->routeIs('seguridad.create') ? 'active' : '' }}" 
+                                    href="{{ route('seguridad.create') }}">
+                                         Nuevo Registro
+                                    </a>
+                                    
+                                    <a class="nav-link {{ request()->routeIs('seguridad.index') && request('estado') == 'pendiente' ? 'active' : '' }}" 
+                                    href="{{ route('seguridad.index', ['estado' => 'pendiente']) }}">
+                                        Incidentes Pendientes
+                                    </a>
+                                @endcan
+                                
+                                {{-- RESIDENTE - Reportes personales --}}
+                                @can('reportar-incidentes')
+                                    {{-- Solo mostrar si NO es personal de seguridad --}}
+                                    @cannot('crear-registro-seguridad')
+                                    <a class="nav-link {{ request()->routeIs('seguridad.reportar-incidente') ? 'active' : '' }}" 
+                                    href="{{ route('seguridad.reportar-incidente') }}">
+                                         Reportar Incidente
+                                    </a>
+                                    
+                                    <a class="nav-link {{ request()->routeIs('seguridad.index') ? 'active' : '' }}" 
+                                    href="{{ route('seguridad.index') }}">
+                                        Mis Reportes
+                                    </a>
+                                    @endcannot
+                                @endcan
+                            </nav>
+                        </div>
+                        
                     </nav>
                 </div>
 

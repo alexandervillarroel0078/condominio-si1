@@ -192,7 +192,7 @@ class VisitaController extends Controller
         
         //  CONTROL DE ACCESO SEGÚN LOS 3 PERMISOS
         if ($this->tienePermiso('administrar visitas') || $this->tienePermiso('operar porteria')) {
-            // 🔧 ADMIN o 🚪 PORTERO: Pueden ver CUALQUIER visita
+            // ADMIN o PORTERO: Pueden ver CUALQUIER visita
             // Sin restricciones
         } elseif ($this->tienePermiso('gestionar visitas')) {
             // 🏠 RESIDENTE: Solo SUS propias visitas
@@ -333,7 +333,7 @@ class VisitaController extends Controller
     // VALIDAR CÓDIGO - SOLO PORTERO Y ADMIN
     public function mostrarValidarCodigo()
     {
-        // 🚪 Solo PORTERO y 🔧 ADMIN pueden validar códigos
+        // Solo PORTERO y  ADMIN pueden validar códigos
         if (!$this->tieneAlgunPermiso(['operar porteria', 'administrar visitas'])) {
             abort(403, 'No tienes permisos para validar códigos');
         }
@@ -344,7 +344,7 @@ class VisitaController extends Controller
     // VALIDAR CÓDIGO CON TOLERANCIA DE 30 MINUTOS
     public function validarCodigo(Request $request)
     {
-        // 🚪 Solo PORTERO y 🔧 ADMIN pueden validar códigos
+        //  Solo PORTERO y  ADMIN pueden validar códigos
         if (!$this->tieneAlgunPermiso(['operar porteria', 'administrar visitas'])) {
             return response()->json([
                 'success' => false,

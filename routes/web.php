@@ -26,7 +26,6 @@ use App\Http\Controllers\UnidadController;
 use App\Http\Controllers\VisitaController; 
 use App\Http\Controllers\RegistroSeguridadController;
 use App\Http\Controllers\MultaController;
-use App\Http\Controllers\VisitaController;
 use App\Http\Controllers\NotificacionController;
 use App\Http\Controllers\ComunicadoController;
 use App\Http\Controllers\InventarioController;

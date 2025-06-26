@@ -68,7 +68,7 @@ class AreaComunController extends Controller
         $validated = $request->validate([
             'nombre' => 'required|string|max:50',
             'monto'  => 'required|numeric|min:0',
-            'estado' => 'required|in:libre,ocupado,mantenimiento',
+            'estado' => 'required|in:activo,inactivo,mantenimiento',
         ]);
 
         $this->registrarEnBitacora('Usuario Actualizo un Area Comun', $areaComun->id);

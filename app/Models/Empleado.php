@@ -20,8 +20,12 @@ class Empleado extends Model
     {
         return $this->hasMany(Multa::class);
     }
-        public function getNombreCompletoAttribute()
+    public function getNombreCompletoAttribute()
     {
         return $this->nombre . ' ' . $this->apellido;
+    }
+    public function reclamos()
+    {
+        return $this->hasMany(Reclamo::class);
     }
 }
